@@ -4,68 +4,99 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Кабинет врача</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Inter',sans-serif;background:#eef2f7;color:#1e2a3a;min-height:100vh}
-.header{background:linear-gradient(135deg,#0f766e 0%,#0e7490 55%,#1e40af 100%);color:#fff;padding:18px 28px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px;box-shadow:0 4px 18px rgba(14,116,144,.35)}
-.header h1{font-size:22px;font-weight:800;letter-spacing:.3px}
-.header .sub{font-size:12.5px;opacity:.85;margin-top:2px}
-.doc-select{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.doc-select label{font-size:13px;font-weight:600;opacity:.9}
-.doc-select select{padding:10px 14px;border-radius:10px;border:none;font-size:14px;font-weight:600;color:#0f172a;min-width:280px;cursor:pointer;outline:none}
-.tabs{max-width:980px;margin:22px auto 0;padding:0 20px;display:flex;gap:10px}
-.tab{flex:1;padding:13px;text-align:center;font-weight:700;font-size:14.5px;border-radius:12px 12px 0 0;background:#dbe4ef;color:#3b4a5f;cursor:pointer;transition:.2s;border:none;font-family:inherit}
-.tab:hover{background:#cdd9e8}
-.tab.active{background:#fff;color:#0e7490;box-shadow:0 -4px 12px rgba(0,0,0,.06)}
-.container{max-width:980px;margin:0 auto;padding:20px}
-.card{background:#fff;border-radius:16px;padding:22px;box-shadow:0 2px 12px rgba(15,42,74,.07);margin-bottom:18px}
-.card h2{font-size:17px;font-weight:800;color:#0f2a4a;margin-bottom:14px;display:flex;align-items:center;gap:8px}
-.toolbar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px}
-.toolbar label{font-size:13.5px;font-weight:600;color:#3b4a5f}
-.toolbar input[type=date]{padding:9px 12px;border:1.5px solid #d5dee9;border-radius:10px;font-family:inherit;font-size:14px;color:#0f2a4a;outline:none;background:#f8fafd}
-.toolbar input[type=date]:focus{border-color:#0e7490}
-.appt{display:flex;align-items:center;gap:14px;padding:14px 16px;border:1.5px solid #e3eaf2;border-radius:12px;margin-bottom:10px;background:#fbfdff;transition:.2s}
-.appt:hover{border-color:#0e7490;background:#f4fbfd}
-.appt.referral{border-color:#f59e0b;background:#fffbeb}
-.time-badge{background:#0e7490;color:#fff;font-weight:800;font-size:15px;padding:8px 13px;border-radius:9px;min-width:64px;text-align:center}
-.appt.referral .time-badge{background:#d97706}
-.appt-info{flex:1;min-width:0}
-.p-name{font-weight:700;font-size:15px;color:#0f2a4a}
-.p-meta{font-size:12.5px;color:#64748b;margin-top:3px}
-.p-reason{font-size:13px;color:#334155;margin-top:4px}
-.badge-ref{display:inline-block;background:#fef3c7;color:#92400e;font-size:11.5px;font-weight:700;padding:3px 9px;border-radius:20px;margin-top:5px}
-.btn{font-family:inherit;font-size:13.5px;font-weight:700;padding:9px 16px;border-radius:10px;border:none;cursor:pointer;transition:.2s}
-.btn-outline{background:#fff;color:#0e7490;border:1.5px solid #0e7490}
-.btn-outline:hover{background:#0e7490;color:#fff}
-.btn-primary{background:linear-gradient(135deg,#0e7490,#1d4ed8);color:#fff}
-.btn-primary:hover{filter:brightness(1.1)}
-.btn-ghost{background:#eef2f7;color:#475569}
-.btn-ghost:hover{background:#e0e7f0}
-.empty{text-align:center;padding:34px 16px;color:#8899aa}
-.empty .icon{font-size:40px;margin-bottom:8px}
-.empty p{font-size:14.5px}
-.modal-overlay{display:none;position:fixed;inset:0;background:rgba(15,42,74,.45);z-index:50;align-items:center;justify-content:center;padding:20px}
-.modal-overlay.open{display:flex}
-.modal{background:#fff;border-radius:18px;max-width:460px;width:100%;padding:24px;box-shadow:0 20px 50px rgba(0,0,0,.25);max-height:90vh;overflow-y:auto}
-.modal h3{font-size:18px;font-weight:800;color:#0f2a4a;margin-bottom:4px}
-.modal .m-sub{font-size:13px;color:#64748b;margin-bottom:16px}
-.form-row{margin-bottom:14px}
-.form-row label{display:block;font-size:13px;font-weight:600;color:#3b4a5f;margin-bottom:6px}
-.form-row select,.form-row input{width:100%;padding:11px 12px;border:1.5px solid #d5dee9;border-radius:10px;font-family:inherit;font-size:14px;color:#0f2a4a;outline:none;background:#f8fafd}
-.form-row select:focus,.form-row input:focus{border-color:#0e7490;background:#fff}
-.form-row select.err,.form-row input.err{border-color:#ef4444;background:#fef2f2}
-.modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:18px}
-.ref-item{border:1.5px solid #e3eaf2;border-radius:12px;padding:14px 16px;margin-bottom:10px;background:#fbfdff}
-.ref-item .to-doc{font-weight:700;color:#b45309;font-size:13.5px;margin-top:4px}
-.stat-row{display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap}
-.stat{flex:1;min-width:120px;background:linear-gradient(135deg,#0e7490,#1d4ed8);color:#fff;border-radius:12px;padding:14px 16px}
-.stat .num{font-size:24px;font-weight:800}
-.stat .lbl{font-size:12px;opacity:.85;margin-top:2px}
-.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:#134e4a;color:#fff;padding:12px 22px;border-radius:12px;font-size:14px;font-weight:600;opacity:0;transition:.35s;z-index:99;box-shadow:0 8px 24px rgba(0,0,0,.25)}
-.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  *{margin:0; padding:0; box-sizing:border-box;}
+  body{font-family:'Inter',sans-serif; background:#eef2f7; color:#1e2a3a; min-height:100vh;}
+  .header{background:linear-gradient(135deg,#0f766e,#0e7490 55%,#1e40af);
+    color:#fff; padding:18px 28px; display:flex; align-items:center;
+    justify-content:space-between; flex-wrap:wrap; gap:14px;
+    box-shadow:0 4px 18px rgba(14,116,144,.35);}
+  .header h1{font-size:22px; font-weight:800;}
+  .header .sub{font-size:12.5px; opacity:.85; margin-top:2px;}
+  .doc-select{display:flex; align-items:center; gap:10px; flex-wrap:wrap;}
+  .doc-select label{font-size:13px; font-weight:600; opacity:.9;}
+  .doc-select select{padding:10px 14px; border-radius:10px; border:none;
+    font-size:14px; font-weight:600; color:#0f172a; min-width:300px; cursor:pointer;
+    outline:none; font-family:inherit;}
+  .conn{display:inline-block; width:9px; height:9px; border-radius:50%;
+    background:#f59e0b; margin-right:6px;}
+  .conn.ok{background:#22c55e;} .conn.err{background:#ef4444;}
+  .tabs{max-width:1000px; margin:22px auto 0; padding:0 20px; display:flex; gap:10px;}
+  .tab{flex:1; padding:13px; text-align:center; font-weight:700; font-size:14.5px;
+    border-radius:12px 12px 0 0; background:#dbe4ef; color:#3b4a5f; cursor:pointer;
+    transition:.2s; border:none; font-family:inherit;}
+  .tab:hover{background:#cdd9e8;}
+  .tab.active{background:#fff; color:#0e7490; box-shadow:0 -4px 12px rgba(0,0,0,.06);}
+  .container{max-width:1000px; margin:0 auto; padding:20px;}
+  .card{background:#fff; border-radius:16px; padding:22px;
+    box-shadow:0 2px 12px rgba(15,42,74,.07); margin-bottom:18px;}
+  .card h2{font-size:17px; font-weight:800; color:#0f2a4a;
+    margin-bottom:14px; display:flex; align-items:center; gap:8px;}
+  .toolbar{display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:16px;}
+  .toolbar label{font-size:13.5px; font-weight:600; color:#3b4a5f;}
+  .toolbar input[type=date]{padding:9px 12px; border:1.5px solid #d5dee9;
+    border-radius:10px; font-family:inherit; font-size:14px; color:#0f2a4a;
+    outline:none; background:#f8fafd;}
+  .toolbar input[type=date]:focus{border-color:#0e7490;}
+  .appt{display:flex; align-items:center; gap:14px; padding:14px 16px;
+    border:1.5px solid #e3eaf2; border-radius:12px; margin-bottom:10px;
+    background:#fbfdff; transition:.2s;}
+  .appt:hover{border-color:#0e7490; background:#f4fbfd;}
+  .appt.referral{border-color:#f59e0b; background:#fffbeb;}
+  .time-badge{background:#0e7490; color:#fff; font-weight:800; font-size:15px;
+    padding:8px 13px; border-radius:9px; min-width:66px; text-align:center;}
+  .appt.referral .time-badge{background:#d97706;}
+  .appt-info{flex:1; min-width:0;}
+  .p-name{font-weight:700; font-size:15px; color:#0f2a4a;}
+  .p-meta{font-size:12.5px; color:#64748b; margin-top:3px; line-height:1.55;}
+  .p-reason{font-size:13px; color:#334155; margin-top:4px;}
+  .badge-ref{display:inline-block; background:#fef3c7; color:#92400e;
+    font-size:11.5px; font-weight:700; padding:3px 9px; border-radius:20px; margin-top:5px;}
+  .btn{font-family:inherit; font-size:13.5px; font-weight:700;
+    padding:9px 16px; border-radius:10px; border:none; cursor:pointer; transition:.2s;}
+  .btn-outline{background:#fff; color:#0e7490; border:1.5px solid #0e7490;}
+  .btn-outline:hover{background:#0e7490; color:#fff;}
+  .btn-primary{background:linear-gradient(135deg,#0e7490,#1d4ed8); color:#fff;}
+  .btn-primary:hover{filter:brightness(1.1);}
+  .btn-ghost{background:#eef2f7; color:#475569;}
+  .btn-ghost:hover{background:#e0e7f0;}
+  .empty{text-align:center; padding:34px 16px; color:#8899aa;}
+  .empty .icon{font-size:40px; margin-bottom:8px;}
+  .empty p{font-size:14.5px; line-height:1.55;}
+  .modal-overlay{display:none; position:fixed; inset:0; background:rgba(15,42,74,.45);
+    z-index:50; align-items:center; justify-content:center; padding:20px;}
+  .modal-overlay.open{display:flex;}
+  .modal{background:#fff; border-radius:18px; max-width:480px; width:100%; padding:24px;
+    box-shadow:0 20px 50px rgba(0,0,0,.25); max-height:90vh; overflow-y:auto;}
+  .modal h3{font-size:18px; font-weight:800; color:#0f2a4a; margin-bottom:4px;}
+  .modal .m-sub{font-size:13px; color:#64748b; margin-bottom:16px;}
+  .form-row{margin-bottom:14px;}
+  .form-row label{display:block; font-size:13px; font-weight:600;
+    color:#3b4a5f; margin-bottom:6px;}
+  .form-row select,.form-row input{width:100%; padding:11px 12px;
+    border:1.5px solid #d5dee9; border-radius:10px; font-family:inherit;
+    font-size:14px; color:#0f2a4a; outline:none; background:#f8fafd;}
+  .form-row select:focus,.form-row input:focus{border-color:#0e7490; background:#fff;}
+  .form-row .err{border-color:#ef4444 !important; background:#fef2f2 !important;}
+  .modal-actions{display:flex; gap:10px; justify-content:flex-end; margin-top:18px;}
+  .ref-item{border:1.5px solid #e3eaf2; border-radius:12px; padding:14px 16px;
+    margin-bottom:10px; background:#fbfdff;}
+  .ref-item .to-doc{font-weight:700; color:#b45309; font-size:13.5px; margin-top:4px;}
+  .stat-row{display:flex; gap:12px; margin-bottom:16px; flex-wrap:wrap;}
+  .stat{flex:1; min-width:120px;
+    background:linear-gradient(135deg,#0e7490,#1d4ed8);
+    color:#fff; border-radius:12px; padding:14px 16px;}
+  .stat .num{font-size:24px; font-weight:800;}
+  .stat .lbl{font-size:12px; opacity:.85; margin-top:2px;}
+  .toast{position:fixed; bottom:24px; left:50%;
+    transform:translateX(-50%) translateY(80px);
+    background:#134e4a; color:#fff; padding:12px 22px; border-radius:12px;
+    font-size:14px; font-weight:600; opacity:0; transition:.35s; z-index:99;
+    box-shadow:0 8px 24px rgba(0,0,0,.25); max-width:90vw;}
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
 </style>
 </head>
 <body>
@@ -73,17 +104,22 @@ body{font-family:'Inter',sans-serif;background:#eef2f7;color:#1e2a3a;min-height:
 <div class="header">
   <div>
     <h1>🩺 Кабинет врача</h1>
-    <div class="sub">Поликлиника — личный приём</div>
+    <div class="sub">
+      <span class="conn" id="connDot"></span><span id="connLabel">подключение…</span>
+      &middot; приём 5 мин + перерыв 3 мин
+    </div>
   </div>
   <div class="doc-select">
     <label>Врач:</label>
-    <select id="doctorSelect" onchange="selectDoctor(this.value)"><option value="">— выберите себя —</option></select>
+    <select id="doctorSelect" onchange="selectDoctor(this.value)">
+      <option value="">— выберите себя —</option>
+    </select>
   </div>
 </div>
 
 <div class="tabs">
-  <button class="tab active" id="tabAppts" onclick="switchTab('appts')">Приёмы</button>
-  <button class="tab" id="tabRefs" onclick="switchTab('refs')">Мои направления</button>
+  <button class="tab active" id="tabAppts" onclick="switchTab('appts')">📅 Приёмы</button>
+  <button class="tab" id="tabRefs" onclick="switchTab('refs')">📤 Мои направления</button>
 </div>
 
 <div class="container">
@@ -94,7 +130,7 @@ body{font-family:'Inter',sans-serif;background:#eef2f7;color:#1e2a3a;min-height:
       <div class="toolbar">
         <label>Дата:</label>
         <input type="date" id="apptDate" onchange="renderAppts()">
-        <span id="dayName" style="font-size:13px;color:#64748b;font-weight:600"></span>
+        <span id="dayName" style="font-size:13px; color:#64748b; font-weight:600"></span>
       </div>
       <div class="stat-row" id="statRow"></div>
       <div id="apptList"></div>
@@ -103,25 +139,25 @@ body{font-family:'Inter',sans-serif;background:#eef2f7;color:#1e2a3a;min-height:
 
   <div id="viewRefs" style="display:none">
     <div class="card">
-      <h2>📤 Мои направления к коллегам</h2>
+      <h2>📤 Пациенты, направленные мной</h2>
       <div id="refList"></div>
     </div>
   </div>
 
 </div>
 
-<!-- Модальное окно: записать к другому врачу -->
+<!-- МОДАЛЬНОЕ ОКНО НАПРАВЛЕНИЯ -->
 <div class="modal-overlay" id="refModal">
   <div class="modal">
     <h3>Записать к другому врачу</h3>
     <div class="m-sub" id="refModalSub"></div>
     <div class="form-row">
       <label>К какому врачу</label>
-      <select id="refDoctor"></select>
+      <select id="refDoctor" onchange="onRefFieldsChange()"></select>
     </div>
     <div class="form-row">
       <label>Дата приёма</label>
-      <input type="date" id="refDate">
+      <input type="date" id="refDate" onchange="onRefFieldsChange()">
     </div>
     <div class="form-row">
       <label>Время (свободные слоты)</label>
@@ -153,8 +189,7 @@ body{font-family:'Inter',sans-serif;background:#eef2f7;color:#1e2a3a;min-height:
 
 <script>
 /* ============================================================
-   FIREBASE INIT (compat SDK)
-   Подключается ДО основного скрипта приложения
+   FIREBASE INIT
 ============================================================ */
 const firebaseConfig = {
   apiKey: "AIzaSyBlZ5ZtyTXgtXxSJAx1jOxwhTrzlHRJmo",
@@ -165,216 +200,265 @@ const firebaseConfig = {
   messagingSenderId: "385000840969",
   appId: "1:385000840969:web:1ec8d09176b6551dc0fdd8"
 };
-
 firebase.initializeApp(firebaseConfig);
-
-// Realtime Database — глобальный объект, используется во всём приложении
 const db = firebase.database();
-db.goOnline();
+
+/* Индикатор соединения */
+db.ref('.info/connected').on('value', s=>{
+  const ok = s.val() === true;
+  const dot = document.getElementById('connDot');
+  dot.className = 'conn ' + (ok ? 'ok' : 'err');
+  document.getElementById('connLabel').textContent =
+    ok ? 'Firebase подключён' : 'нет соединения';
+});
 
 /* ============================================================
-   СПРАВОЧНИК ВРАЧЕЙ
-   lunch — время начала обеда в минутах от 00:00 (обед 15 мин, окно 12:00–13:00)
+   СПРАВОЧНИК ВРАЧЕЙ (совпадает с registratura.html)
 ============================================================ */
 const DOCTORS = [
-  {id:'d1',  name:'Иванов Алексей Петрович',   spec:'Терапевт',             room:'101', lunch:720},
-  {id:'d2',  name:'Смирнова Ольга Викторовна', spec:'Хирург',               room:'102', lunch:724},
-  {id:'d3',  name:'Кузнецов Дмитрий Андреевич',spec:'Кардиолог',            room:'103', lunch:728},
-  {id:'d4',  name:'Волкова Елена Сергеевна',   spec:'Офтальмолог',          room:'104', lunch:732},
-  {id:'d5',  name:'Морозов Игорь Николаевич',  spec:'Стоматолог',           room:'105', lunch:736},
-  {id:'d6',  name:'Петрова Анна Дмитриевна',   spec:'Педиатр',              room:'106', lunch:740},
-  {id:'d7',  name:'Соколов Артём Валерьевич',  spec:'Невролог',             room:'107', lunch:744},
-  {id:'d8',  name:'Лебедева Мария Ивановна',   spec:'ЛОР',                  room:'108', lunch:748},
-  {id:'d9',  name:'Фёдоров Павел Олегович',    spec:'Ортопед-травматолог',  room:'109', lunch:752},
-  {id:'d10', name:'Григорьева Наталья Львовна',spec:'Эндокринолог',         room:'110', lunch:756},
-  {id:'d11', name:'Зайцев Роман Витальевич',   spec:'Дерматолог',           room:'111', lunch:760},
-  {id:'d12', name:'Киселёва Дарья Романовна',  spec:'Гинеколог',            room:'112', lunch:764}
+  {id:'d1',  name:'Иванов Алексей Петрович',    spec:'Терапевт',            room:'101', lunch:720},
+  {id:'d2',  name:'Смирнова Ольга Викторовна',  spec:'Хирург',              room:'102', lunch:724},
+  {id:'d3',  name:'Кузнецов Дмитрий Андреевич', spec:'Кардиолог',           room:'103', lunch:728},
+  {id:'d4',  name:'Волкова Елена Сергеевна',    spec:'Офтальмолог',         room:'104', lunch:732},
+  {id:'d5',  name:'Морозов Игорь Николаевич',   spec:'Стоматолог',          room:'105', lunch:736},
+  {id:'d6',  name:'Петрова Анна Дмитриевна',    spec:'Педиатр',             room:'106', lunch:740},
+  {id:'d7',  name:'Соколов Артём Валерьевич',   spec:'Невролог',            room:'107', lunch:744},
+  {id:'d8',  name:'Лебедева Мария Ивановна',    spec:'ЛОР',                 room:'108', lunch:748},
+  {id:'d9',  name:'Фёдоров Павел Олегович',     spec:'Ортопед-травматолог', room:'109', lunch:752},
+  {id:'d10', name:'Григорьева Наталья Львовна', spec:'Эндокринолог',        room:'110', lunch:756},
+  {id:'d11', name:'Зайцев Роман Витальевич',    spec:'Дерматолог',          room:'111', lunch:760},
+  {id:'d12', name:'Киселёва Дарья Романовна',   spec:'Гинеколог',           room:'112', lunch:764}
 ];
+const APPT_START = 8*60, APPT_END = 20*60;
+const APPT_LEN = 5, BREAK_LEN = 3, STEP = APPT_LEN + BREAK_LEN, LUNCH_LEN = 15;
 
-const APPT_START = 8*60;      // 8:00
-const APPT_END = 20*60;       // 20:00
-const APPT_LEN = 5;           // приём 5 минут
-const BREAK_LEN = 3;          // перерыв 3 минуты
-const STEP = APPT_LEN + BREAK_LEN;
-const LUNCH_LEN = 15;
-
+/* ============================================================
+   СОСТОЯНИЕ
+============================================================ */
 let currentDoctor = localStorage.getItem('currentDoctor') || '';
 let patients = {}, appointments = {};
-let refContext = null; // пациент, которого записываем к другому врачу
+let refContext = null;
 
-/* ---------- время ---------- */
-function fmtTime(m){const h=Math.floor(m/60),mm=m%60;return String(h).padStart(2,'0')+':'+String(mm).padStart(2,'0');}
-function todayStr(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
-const DAY_NAMES=['воскресенье','понедельник','вторник','среда','четверг','пятница','суббота'];
-function dayName(ds){const d=new Date(ds+'T12:00:00');return isNaN(d)?'':DAY_NAMES[d.getDay()];}
+/* ============================================================
+   УТИЛИТЫ
+============================================================ */
+function pad(n){ return String(n).padStart(2,'0'); }
+function fmtTime(t){ return pad(Math.floor(t/60)) + ':' + pad(t%60); }
+function todayStr(){
+  const d = new Date();
+  return d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate());
+}
+function fmtDate(ds){ return ds ? ds.split('-').reverse().join('.') : ''; }
+const DAY_NAMES = ['воскресенье','понедельник','вторник','среда','четверг','пятница','суббота'];
+function dayName(ds){
+  const d = new Date(ds + 'T12:00:00');
+  return isNaN(d) ? '' : DAY_NAMES[d.getDay()];
+}
+function esc(s){
+  return String(s==null?'':s).replace(/[&<>"']/g,c=>({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  }[c]));
+}
 
-/* ---------- слоты врача на дату (учёт обеда и занятости) ---------- */
+/* ============================================================
+   СЛОТЫ (с учётом обеда и занятости)
+============================================================ */
 function computeSlots(docId, dateStr){
   const doc = DOCTORS.find(d=>d.id===docId);
   if(!doc) return [];
   const busy = {};
   Object.values(appointments).forEach(a=>{
-    if(a.doctorId===docId && a.date===dateStr && a.status!=='cancelled') busy[a.time]=true;
+    if(a.doctorId===docId && a.date===dateStr && a.status!=='cancelled') busy[a.time] = true;
   });
-  const out=[];
-  for(let t=APPT_START; t+APPT_LEN<=APPT_END; t+=STEP){
-    if(t < doc.lunch+LUNCH_LEN && t+APPT_LEN > doc.lunch) continue; // слот пересекает обед
-    out.push({time:fmtTime(t), busy:!!busy[fmtTime(t)]});
+  const out = [];
+  for(let t = APPT_START; t + APPT_LEN <= APPT_END; t += STEP){
+    if(t < doc.lunch + LUNCH_LEN && t + APPT_LEN > doc.lunch) continue;
+    const s = fmtTime(t);
+    out.push({ time: s, busy: !!busy[s] });
   }
   return out;
 }
 
-/* ---------- выбор врача ---------- */
+/* ============================================================
+   ВЫБОР ВРАЧА
+============================================================ */
 function fillDoctorSelect(){
-  const sel=document.getElementById('doctorSelect');
+  const sel = document.getElementById('doctorSelect');
   DOCTORS.forEach(d=>{
-    const o=document.createElement('option');
-    o.value=d.id; o.textContent=d.spec+' '+d.name.split(' ')[0]+' — каб. '+d.room;
+    const o = document.createElement('option');
+    o.value = d.id;
+    o.textContent = d.spec + ' ' + d.name.split(' ')[0] + ' — каб. ' + d.room;
     sel.appendChild(o);
   });
-  sel.value=currentDoctor;
-  if(currentDoctor) onDoctorLoaded();
+  sel.value = currentDoctor;
 }
-
 function selectDoctor(id){
-  currentDoctor=id;
-  localStorage.setItem('currentDoctor', id);
-  if(id) renderAll();
-}
-
-function onDoctorLoaded(){
-  document.getElementById('apptDate').value = todayStr();
+  currentDoctor = id;
+  if(id) localStorage.setItem('currentDoctor', id);
+  else   localStorage.removeItem('currentDoctor');
   renderAll();
 }
 
-/* ---------- вкладки ---------- */
+/* ============================================================
+   ВКЛАДКИ
+============================================================ */
 function switchTab(tab){
-  document.getElementById('viewAppts').style.display = tab==='appts'?'block':'none';
-  document.getElementById('viewRefs').style.display = tab==='refs'?'block':'none';
+  document.getElementById('viewAppts').style.display = tab==='appts' ? 'block' : 'none';
+  document.getElementById('viewRefs').style.display  = tab==='refs'  ? 'block' : 'none';
   document.getElementById('tabAppts').classList.toggle('active', tab==='appts');
-  document.getElementById('tabRefs').classList.toggle('active', tab==='refs');
+  document.getElementById('tabRefs').classList.toggle('active',  tab==='refs');
   renderAll();
 }
 
-/* ---------- рендер ---------- */
+/* ============================================================
+   РЕНДЕР
+============================================================ */
 function renderAll(){
-  if(!currentDoctor){ return; }
+  if(!currentDoctor) return;
   renderAppts();
   renderRefs();
 }
 
 function renderAppts(){
-  const dateStr=document.getElementById('apptDate').value || todayStr();
-  document.getElementById('dayName').textContent='· '+dayName(dateStr);
-  const doc=DOCTORS.find(d=>d.id===currentDoctor);
-  const list=document.getElementById('apptList');
-  const stats=document.getElementById('statRow');
+  const dateStr = document.getElementById('apptDate').value || todayStr();
+  document.getElementById('dayName').textContent = '· ' + dayName(dateStr);
 
-  const items=Object.values(appointments)
-    .filter(a=>a.doctorId===currentDoctor && a.date===dateStr && a.status!=='cancelled')
+  const doc = DOCTORS.find(d=>d.id === currentDoctor);
+  const list = document.getElementById('apptList');
+  const stats = document.getElementById('statRow');
+
+  const items = Object.values(appointments)
+    .filter(a=>a.doctorId === currentDoctor && a.date === dateStr && a.status !== 'cancelled')
     .sort((a,b)=>a.time.localeCompare(b.time));
 
   stats.innerHTML =
-    '<div class="stat"><div class="num">'+items.length+'</div><div class="lbl">Приёмов на день</div></div>'+
-    '<div class="stat"><div class="num">'+items.filter(a=>a.referralFromName).length+'</div><div class="lbl">По направлению</div></div>'+
-    '<div class="stat"><div class="num">'+(items.length*APPT_LEN)+'</div><div class="lbl">Минут приёма</div></div>';
+    '<div class="stat"><div class="num">' + items.length + '</div><div class="lbl">Приёмов на день</div></div>' +
+    '<div class="stat"><div class="num">' + items.filter(a=>a.referralFromName).length + '</div><div class="lbl">По направлению</div></div>' +
+    '<div class="stat"><div class="num">' + (items.length * APPT_LEN) + '</div><div class="lbl">Минут приёма</div></div>';
 
   if(!items.length){
-    list.innerHTML='<div class="empty"><div class="icon">🗓️</div><p>На этот день записей нет.<br>Новые записи появятся здесь автоматически из регистратуры.</p></div>';
+    list.innerHTML = '<div class="empty"><div class="icon">🗓️</div>' +
+      '<p>На этот день записей нет.<br>Новые записи появятся здесь автоматически из регистратуры.</p></div>';
     return;
   }
 
   list.innerHTML = items.map(a=>{
     const ref = a.referralFromName
-      ? '<span class="badge-ref">📤 Направление от: '+esc(a.referralFromName)+'</span>' : '';
-    return '<div class="appt'+(a.referralFromName?' referral':'')+'">'+
-      '<div class="time-badge">'+esc(a.time)+'</div>'+
-      '<div class="appt-info">'+
-        '<div class="p-name">'+esc(a.fio)+'</div>'+
-        '<div class="p-meta">Карта №'+esc(a.card||'—')+' · Полис: '+esc(a.polis||'—')+' · Тел.: '+esc(a.phone||'—')+'</div>'+
-        '<div class="p-reason">Причина: '+esc(a.reason||'не указана')+(doc?' · каб. '+doc.room:'')+'</div>'+
-        ref+
-      '</div>'+
-      '<button class="btn btn-outline" onclick="openRefModal(\''+a.id+'\')">К другому врачу</button>'+
+      ? '<span class="badge-ref">📤 Направление от: ' + esc(a.referralFromName) + '</span>'
+      : '';
+    return '<div class="appt' + (a.referralFromName ? ' referral' : '') + '">' +
+      '<div class="time-badge">' + esc(a.time) + '</div>' +
+      '<div class="appt-info">' +
+        '<div class="p-name">' + esc(a.fio) + '</div>' +
+        '<div class="p-meta">Карта №' + esc(a.card||'—') +
+          ' · Полис: ' + esc(a.polis||'—') +
+          ' · Тел.: ' + esc(a.phone||'—') + '</div>' +
+        '<div class="p-reason">Причина: ' + esc(a.reason||'не указана') +
+          (doc ? ' · каб. ' + doc.room : '') + '</div>' +
+        ref +
+      '</div>' +
+      '<button class="btn btn-outline" onclick="openRefModal(\'' + a.id + '\')">К другому врачу</button>' +
     '</div>';
   }).join('');
 }
 
 function renderRefs(){
-  const list=document.getElementById('refList');
-  const items=Object.values(appointments)
-    .filter(a=>a.referralFrom===currentDoctor && a.status!=='cancelled')
+  const list = document.getElementById('refList');
+  const items = Object.entries(appointments)
+    .map(([id,a])=>({id, ...a}))
+    .filter(a=>a.referralFrom === currentDoctor && a.status !== 'cancelled')
     .sort((a,b)=>(b.date+b.time).localeCompare(a.date+a.time));
 
   if(!items.length){
-    list.innerHTML='<div class="empty"><div class="icon">📤</div><p>Вы пока не отправляли пациентов к коллегам.<br>Откройте «Приёмы» и нажмите «К другому врачу».</p></div>';
+    list.innerHTML = '<div class="empty"><div class="icon">📤</div>' +
+      '<p>Вы пока не направляли пациентов к коллегам.<br>' +
+      'Откройте «Приёмы» и нажмите «К другому врачу».</p></div>';
     return;
   }
 
   list.innerHTML = items.map(a=>{
-    const doc=DOCTORS.find(d=>d.id===a.doctorId);
-    return '<div class="ref-item">'+
-      '<div class="p-name">'+esc(a.fio)+' <span style="color:#64748b;font-weight:500;font-size:12.5px">· карта №'+esc(a.card||'—')+'</span></div>'+
-      '<div class="to-doc">→ '+esc(doc?doc.spec+' '+doc.name:'врач')+', '+esc(a.date)+' в '+esc(a.time)+', каб. '+(doc?doc.room:'—')+'</div>'+
-      '<div class="p-reason">Причина: '+esc(a.reason||'не указана')+'</div>'+
+    const d = DOCTORS.find(x=>x.id===a.doctorId);
+    return '<div class="ref-item">' +
+      '<div class="p-name">' + esc(a.fio) +
+        ' <span style="color:#64748b; font-weight:500; font-size:12.5px">· карта №' +
+        esc(a.card||'—') + '</span></div>' +
+      '<div class="to-doc">→ ' + esc(d ? d.spec + ' ' + d.name : 'врач') +
+        ', ' + esc(fmtDate(a.date)) + ' в ' + esc(a.time) +
+        ', каб. ' + (d ? d.room : '—') + '</div>' +
+      '<div class="p-reason">Причина: ' + esc(a.reason||'не указана') + '</div>' +
     '</div>';
   }).join('');
 }
 
-/* ---------- модальное окно направления ---------- */
+/* ============================================================
+   МОДАЛЬНОЕ ОКНО НАПРАВЛЕНИЯ
+============================================================ */
 function openRefModal(apptId){
-  const a=appointments[apptId];
+  const a = appointments[apptId];
   if(!a) return;
-  refContext=apptId;
-  document.getElementById('refModalSub').textContent='Пациент: '+a.fio+' (карта №'+(a.card||'—')+')';
-  const sel=document.getElementById('refDoctor');
-  sel.innerHTML='<option value="">— выберите врача —</option>'+DOCTORS.filter(d=>d.id!==currentDoctor)
-    .map(d=>'<option value="'+d.id+'">'+d.spec+' '+d.name+' — каб. '+d.room+'</option>').join('');
+  refContext = apptId;
+  document.getElementById('refModalSub').textContent =
+    'Пациент: ' + a.fio + ' (карта №' + (a.card||'—') + ')';
+
+  const sel = document.getElementById('refDoctor');
+  sel.innerHTML = '<option value="">— выберите врача —</option>' +
+    DOCTORS.filter(d=>d.id !== currentDoctor)
+      .map(d=>'<option value="' + d.id + '">' + d.spec + ' ' + d.name + ' — каб. ' + d.room + '</option>')
+      .join('');
+
   sel.classList.remove('err');
-  document.getElementById('refDate').value=document.getElementById('apptDate').value||todayStr();
+  document.getElementById('refDate').value = document.getElementById('apptDate').value || todayStr();
   document.getElementById('refDate').classList.remove('err');
-  document.getElementById('refTime').innerHTML='<option value="">— выберите дату и врача —</option>';
+  document.getElementById('refTime').innerHTML = '<option value="">— выберите дату и врача —</option>';
   document.getElementById('refTime').classList.remove('err');
-  document.getElementById('refReason').value='';
+  document.getElementById('refReason').value = '';
   document.getElementById('refReason').classList.remove('err');
+
   document.getElementById('refModal').classList.add('open');
 }
-
-function closeRefModal(){ document.getElementById('refModal').classList.remove('open'); refContext=null; }
+function closeRefModal(){
+  document.getElementById('refModal').classList.remove('open');
+  refContext = null;
+}
 
 function onRefFieldsChange(){
-  const docId=document.getElementById('refDoctor').value;
-  const dateStr=document.getElementById('refDate').value;
-  const tSel=document.getElementById('refTime');
+  const docId   = document.getElementById('refDoctor').value;
+  const dateStr = document.getElementById('refDate').value;
+  const tSel    = document.getElementById('refTime');
   if(docId && dateStr){
-    const slots=computeSlots(docId, dateStr).filter(s=>!s.busy);
+    const slots = computeSlots(docId, dateStr).filter(s=>!s.busy);
     tSel.innerHTML = slots.length
-      ? '<option value="">— выберите время —</option>'+slots.map(s=>'<option value="'+s.time+'">'+s.time+'</option>').join('')
+      ? '<option value="">— выберите время —</option>' +
+        slots.map(s=>'<option value="' + s.time + '">' + s.time + '</option>').join('')
       : '<option value="">на этот день свободных слотов нет</option>';
   } else {
-    tSel.innerHTML='<option value="">— выберите дату и врача —</option>';
+    tSel.innerHTML = '<option value="">— выберите дату и врача —</option>';
   }
 }
 
 function submitReferral(){
   if(!refContext) return;
-  const docId=document.getElementById('refDoctor').value;
-  const dateStr=document.getElementById('refDate').value;
-  const time=document.getElementById('refTime').value;
-  const reason=document.getElementById('refReason').value;
-  let ok=true;
-  [['refDoctor',docId],['refDate',dateStr],['refTime',time],['refReason',reason]].forEach(([id,v])=>{
-    document.getElementById(id).classList.toggle('err', !v);
-    if(!v) ok=false;
-  });
+  const docId   = document.getElementById('refDoctor').value;
+  const dateStr = document.getElementById('refDate').value;
+  const time    = document.getElementById('refTime').value;
+  const reason  = document.getElementById('refReason').value;
+
+  let ok = true;
+  [['refDoctor',docId], ['refDate',dateStr], ['refTime',time], ['refReason',reason]]
+    .forEach(([id,v])=>{
+      document.getElementById(id).classList.toggle('err', !v);
+      if(!v) ok = false;
+    });
   if(!ok) return;
-  // проверка занятости на момент отправки
-  if(computeSlots(docId,dateStr).some(s=>s.time===time && s.busy)){
+
+  if(computeSlots(docId, dateStr).some(s=>s.time===time && s.busy)){
     toast('Это время уже занято — выберите другое'); return;
   }
-  const src=appointments[refContext];
-  const doc=DOCTORS.find(d=>d.id===currentDoctor);
-  const target=DOCTORS.find(d=>d.id===docId);
+
+  const src = appointments[refContext];
+  const srcDoc = DOCTORS.find(d=>d.id === currentDoctor);
+  const target = DOCTORS.find(d=>d.id === docId);
+
   db.ref('appointments').push({
     doctorId: docId,
     patientId: src.patientId || '',
@@ -386,37 +470,43 @@ function submitReferral(){
     time: time,
     reason: reason,
     referralFrom: currentDoctor,
-    referralFromName: doc ? doc.spec+' '+doc.name : '',
-    targetRoom: target ? target.room : '',
+    referralFromName: srcDoc ? (srcDoc.spec + ' ' + srcDoc.name) : '',
     status: 'active',
     createdAt: Date.now()
-  });
-  closeRefModal();
-  toast('Пациент записан к '+ (target?target.spec:'врачу') +' на '+dateStr+' '+time);
+  }).then(()=>{
+    closeRefModal();
+    toast('Пациент записан к ' + (target ? target.spec : 'врачу') +
+      ' на ' + fmtDate(dateStr) + ' в ' + time);
+  }).catch(err => toast('Ошибка: ' + err.message));
 }
 
-/* ---------- утилиты ---------- */
-function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+/* ============================================================
+   УТИЛИТА TOAST
+============================================================ */
 function toast(msg){
-  const t=document.getElementById('toast');
-  t.textContent=msg; t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'), 3200);
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._t);
+  t._t = setTimeout(()=>t.classList.remove('show'), 3200);
 }
 
-/* ---------- слушатели Firebase (реальное время) ---------- */
-db.ref('patients').on('value', snap=>{ patients=snap.val()||{}; });
+/* ============================================================
+   FIREBASE LISTENERS
+============================================================ */
+db.ref('patients').on('value', snap=>{ patients = snap.val() || {}; });
 db.ref('appointments').on('value', snap=>{
-  appointments=snap.val()||{};
-  if(refContext && !appointments[refContext]) refContext=null;
+  appointments = snap.val() || {};
+  if(refContext && !appointments[refContext]) refContext = null;
   renderAll();
 });
 
-/* ---------- запуск ---------- */
-document.getElementById('refDoctor').addEventListener('change', onRefFieldsChange);
-document.getElementById('refDate').addEventListener('change', onRefFieldsChange);
-document.getElementById('apptDate').value=todayStr();
+/* ============================================================
+   СТАРТ
+============================================================ */
+document.getElementById('apptDate').value = todayStr();
 fillDoctorSelect();
-if(currentDoctor && document.getElementById('apptDate').value) renderAll();
+if(currentDoctor) renderAll();
 </script>
 </body>
 </html>
