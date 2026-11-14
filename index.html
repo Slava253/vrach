@@ -19,15 +19,15 @@
   .doc-select{display:flex; align-items:center; gap:10px; flex-wrap:wrap;}
   .doc-select label{font-size:13px; font-weight:600; opacity:.9;}
   .doc-select select{padding:10px 14px; border-radius:10px; border:none;
-    font-size:14px; font-weight:600; color:#0f172a; min-width:300px; cursor:pointer;
-    outline:none; font-family:inherit;}
+    font-size:14px; font-weight:600; color:#0f172a; min-width:320px;
+    cursor:pointer; outline:none; font-family:inherit;}
   .conn{display:inline-block; width:9px; height:9px; border-radius:50%;
     background:#f59e0b; margin-right:6px;}
   .conn.ok{background:#22c55e;} .conn.err{background:#ef4444;}
   .tabs{max-width:1000px; margin:22px auto 0; padding:0 20px; display:flex; gap:10px;}
   .tab{flex:1; padding:13px; text-align:center; font-weight:700; font-size:14.5px;
-    border-radius:12px 12px 0 0; background:#dbe4ef; color:#3b4a5f; cursor:pointer;
-    transition:.2s; border:none; font-family:inherit;}
+    border-radius:12px 12px 0 0; background:#dbe4ef; color:#3b4a5f;
+    cursor:pointer; transition:.2s; border:none; font-family:inherit;}
   .tab:hover{background:#cdd9e8;}
   .tab.active{background:#fff; color:#0e7490; box-shadow:0 -4px 12px rgba(0,0,0,.06);}
   .container{max-width:1000px; margin:0 auto; padding:20px;}
@@ -35,12 +35,18 @@
     box-shadow:0 2px 12px rgba(15,42,74,.07); margin-bottom:18px;}
   .card h2{font-size:17px; font-weight:800; color:#0f2a4a;
     margin-bottom:14px; display:flex; align-items:center; gap:8px;}
-  .toolbar{display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:16px;}
+  .toolbar{display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:16px;}
   .toolbar label{font-size:13.5px; font-weight:600; color:#3b4a5f;}
   .toolbar input[type=date]{padding:9px 12px; border:1.5px solid #d5dee9;
     border-radius:10px; font-family:inherit; font-size:14px; color:#0f2a4a;
     outline:none; background:#f8fafd;}
   .toolbar input[type=date]:focus{border-color:#0e7490;}
+  .toolbar .btn-nav{padding:8px 12px; border:1.5px solid #d5dee9; background:#fff;
+    border-radius:10px; font-family:inherit; font-weight:700; font-size:13.5px;
+    color:#0e7490; cursor:pointer; transition:.15s;}
+  .toolbar .btn-nav:hover{background:#e6f7f9; border-color:#0e7490;}
+  .debug{font-size:12px; color:#94a3b8; margin-top:8px; font-family:monospace;
+    background:#f8fafc; padding:8px 12px; border-radius:8px; border:1px dashed #e2e8f0;}
   .appt{display:flex; align-items:center; gap:14px; padding:14px 16px;
     border:1.5px solid #e3eaf2; border-radius:12px; margin-bottom:10px;
     background:#fbfdff; transition:.2s;}
@@ -66,6 +72,7 @@
   .empty{text-align:center; padding:34px 16px; color:#8899aa;}
   .empty .icon{font-size:40px; margin-bottom:8px;}
   .empty p{font-size:14.5px; line-height:1.55;}
+  .empty .hint{font-size:13px; color:#64748b; margin-top:8px;}
   .modal-overlay{display:none; position:fixed; inset:0; background:rgba(15,42,74,.45);
     z-index:50; align-items:center; justify-content:center; padding:20px;}
   .modal-overlay.open{display:flex;}
@@ -86,8 +93,7 @@
     margin-bottom:10px; background:#fbfdff;}
   .ref-item .to-doc{font-weight:700; color:#b45309; font-size:13.5px; margin-top:4px;}
   .stat-row{display:flex; gap:12px; margin-bottom:16px; flex-wrap:wrap;}
-  .stat{flex:1; min-width:120px;
-    background:linear-gradient(135deg,#0e7490,#1d4ed8);
+  .stat{flex:1; min-width:120px; background:linear-gradient(135deg,#0e7490,#1d4ed8);
     color:#fff; border-radius:12px; padding:14px 16px;}
   .stat .num{font-size:24px; font-weight:800;}
   .stat .lbl{font-size:12px; opacity:.85; margin-top:2px;}
@@ -123,17 +129,20 @@
 </div>
 
 <div class="container">
-
   <div id="viewAppts">
     <div class="card">
       <h2>📅 Расписание приёмов</h2>
       <div class="toolbar">
+        <button class="btn-nav" onclick="shiftDate(-1)" title="Предыдущий день">◀</button>
         <label>Дата:</label>
         <input type="date" id="apptDate" onchange="renderAppts()">
+        <button class="btn-nav" onclick="shiftDate(1)" title="Следующий день">▶</button>
+        <button class="btn-nav" onclick="goToday()">Сегодня</button>
         <span id="dayName" style="font-size:13px; color:#64748b; font-weight:600"></span>
       </div>
       <div class="stat-row" id="statRow"></div>
       <div id="apptList"></div>
+      <div class="debug" id="debugInfo"></div>
     </div>
   </div>
 
@@ -143,10 +152,8 @@
       <div id="refList"></div>
     </div>
   </div>
-
 </div>
 
-<!-- МОДАЛЬНОЕ ОКНО НАПРАВЛЕНИЯ -->
 <div class="modal-overlay" id="refModal">
   <div class="modal">
     <h3>Записать к другому врачу</h3>
@@ -203,17 +210,14 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-/* Индикатор соединения */
 db.ref('.info/connected').on('value', s=>{
   const ok = s.val() === true;
-  const dot = document.getElementById('connDot');
-  dot.className = 'conn ' + (ok ? 'ok' : 'err');
-  document.getElementById('connLabel').textContent =
-    ok ? 'Firebase подключён' : 'нет соединения';
+  document.getElementById('connDot').className = 'conn ' + (ok ? 'ok' : 'err');
+  document.getElementById('connLabel').textContent = ok ? 'Firebase подключён' : 'нет соединения';
 });
 
 /* ============================================================
-   СПРАВОЧНИК ВРАЧЕЙ (совпадает с registratura.html)
+   СПРАВОЧНИК ВРАЧЕЙ
 ============================================================ */
 const DOCTORS = [
   {id:'d1',  name:'Иванов Алексей Петрович',    spec:'Терапевт',            room:'101', lunch:720},
@@ -232,23 +236,26 @@ const DOCTORS = [
 const APPT_START = 8*60, APPT_END = 20*60;
 const APPT_LEN = 5, BREAK_LEN = 3, STEP = APPT_LEN + BREAK_LEN, LUNCH_LEN = 15;
 
-/* ============================================================
-   СОСТОЯНИЕ
-============================================================ */
 let currentDoctor = localStorage.getItem('currentDoctor') || '';
 let patients = {}, appointments = {};
 let refContext = null;
+let lastDebug = { total: 0, myDoctor: 0, myDate: 0 };
 
 /* ============================================================
    УТИЛИТЫ
 ============================================================ */
 function pad(n){ return String(n).padStart(2,'0'); }
 function fmtTime(t){ return pad(Math.floor(t/60)) + ':' + pad(t%60); }
+function fmtDate(ds){ return ds ? ds.split('-').reverse().join('.') : ''; }
 function todayStr(){
   const d = new Date();
   return d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate());
 }
-function fmtDate(ds){ return ds ? ds.split('-').reverse().join('.') : ''; }
+function shiftDateStr(ds, days){
+  const d = new Date(ds + 'T12:00:00');
+  d.setDate(d.getDate() + days);
+  return d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate());
+}
 const DAY_NAMES = ['воскресенье','понедельник','вторник','среда','четверг','пятница','суббота'];
 function dayName(ds){
   const d = new Date(ds + 'T12:00:00');
@@ -261,26 +268,30 @@ function esc(s){
 }
 
 /* ============================================================
-   СЛОТЫ (с учётом обеда и занятости)
+   СЛОТЫ
 ============================================================ */
 function computeSlots(docId, dateStr){
-  const doc = DOCTORS.find(d=>d.id===docId);
+  const doc = DOCTORS.find(d=>d.id === docId);
   if(!doc) return [];
-  const busy = {};
+  const busy = new Set();
   Object.values(appointments).forEach(a=>{
-    if(a.doctorId===docId && a.date===dateStr && a.status!=='cancelled') busy[a.time] = true;
+    if(String(a.doctorId) === String(docId)
+       && String(a.date) === String(dateStr)
+       && String(a.status || 'active') !== 'cancelled'){
+      busy.add(String(a.time));
+    }
   });
   const out = [];
   for(let t = APPT_START; t + APPT_LEN <= APPT_END; t += STEP){
     if(t < doc.lunch + LUNCH_LEN && t + APPT_LEN > doc.lunch) continue;
     const s = fmtTime(t);
-    out.push({ time: s, busy: !!busy[s] });
+    out.push({ time: s, busy: busy.has(s) });
   }
   return out;
 }
 
 /* ============================================================
-   ВЫБОР ВРАЧА
+   ВРАЧ
 ============================================================ */
 function fillDoctorSelect(){
   const sel = document.getElementById('doctorSelect');
@@ -303,18 +314,35 @@ function selectDoctor(id){
    ВКЛАДКИ
 ============================================================ */
 function switchTab(tab){
-  document.getElementById('viewAppts').style.display = tab==='appts' ? 'block' : 'none';
-  document.getElementById('viewRefs').style.display  = tab==='refs'  ? 'block' : 'none';
-  document.getElementById('tabAppts').classList.toggle('active', tab==='appts');
-  document.getElementById('tabRefs').classList.toggle('active',  tab==='refs');
+  document.getElementById('viewAppts').style.display = tab === 'appts' ? 'block' : 'none';
+  document.getElementById('viewRefs').style.display  = tab === 'refs'  ? 'block' : 'none';
+  document.getElementById('tabAppts').classList.toggle('active', tab === 'appts');
+  document.getElementById('tabRefs').classList.toggle('active',  tab === 'refs');
   renderAll();
+}
+
+/* ============================================================
+   ДАТА
+============================================================ */
+function shiftDate(days){
+  const cur = document.getElementById('apptDate').value || todayStr();
+  document.getElementById('apptDate').value = shiftDateStr(cur, days);
+  renderAppts();
+}
+function goToday(){
+  document.getElementById('apptDate').value = todayStr();
+  renderAppts();
 }
 
 /* ============================================================
    РЕНДЕР
 ============================================================ */
 function renderAll(){
-  if(!currentDoctor) return;
+  if(!currentDoctor){
+    document.getElementById('apptList').innerHTML =
+      '<div class="empty"><div class="icon">🩺</div><p>Выберите себя в списке врачей справа сверху.</p></div>';
+    return;
+  }
   renderAppts();
   renderRefs();
 }
@@ -327,9 +355,25 @@ function renderAppts(){
   const list = document.getElementById('apptList');
   const stats = document.getElementById('statRow');
 
-  const items = Object.values(appointments)
-    .filter(a=>a.doctorId === currentDoctor && a.date === dateStr && a.status !== 'cancelled')
-    .sort((a,b)=>a.time.localeCompare(b.time));
+  // 🔍 Отладка: считаем сколько всего и на каждом шаге фильтра
+  const total = Object.values(appointments).length;
+  const myDoctorArr = Object.values(appointments)
+    .filter(a=>String(a.doctorId || '') === String(currentDoctor));
+  const myDateArr = myDoctorArr
+    .filter(a=>String(a.date || '') === String(dateStr));
+  const activeArr = myDateArr
+    .filter(a=>String(a.status || 'active') !== 'cancelled');
+
+  lastDebug = {
+    total,
+    myDoctor: myDoctorArr.length,
+    myDate: myDateArr.length,
+    active: activeArr.length
+  };
+
+  const items = activeArr
+    .slice()
+    .sort((a,b)=>String(a.time || '').localeCompare(String(b.time || '')));
 
   stats.innerHTML =
     '<div class="stat"><div class="num">' + items.length + '</div><div class="lbl">Приёмов на день</div></div>' +
@@ -337,8 +381,23 @@ function renderAppts(){
     '<div class="stat"><div class="num">' + (items.length * APPT_LEN) + '</div><div class="lbl">Минут приёма</div></div>';
 
   if(!items.length){
+    let hint = '';
+    if(lastDebug.total === 0){
+      hint = 'В Firebase пока нет ни одной записи. Создайте запись в регистратуре.';
+    } else if(lastDebug.myDoctor === 0){
+      hint = 'Для врача «' + esc(doc ? doc.spec + ' ' + doc.name : currentDoctor) +
+             '» нет записей. Всего в базе: ' + lastDebug.total +
+             '. Возможно, запись к другому врачу.';
+    } else if(lastDebug.myDate === 0){
+      hint = 'У этого врача есть ' + lastDebug.myDoctor + ' записей, но на другую дату. ' +
+             'Попробуйте пролистать дни ◀ ▶ или нажать «Сегодня».';
+    } else {
+      hint = 'Все записи этого врача на ' + fmtDate(dateStr) + ' отменены.';
+    }
     list.innerHTML = '<div class="empty"><div class="icon">🗓️</div>' +
-      '<p>На этот день записей нет.<br>Новые записи появятся здесь автоматически из регистратуры.</p></div>';
+      '<p>На ' + fmtDate(dateStr) + ' записей нет.</p>' +
+      '<div class="hint">' + hint + '</div></div>';
+    updateDebug();
     return;
   }
 
@@ -350,24 +409,36 @@ function renderAppts(){
       '<div class="time-badge">' + esc(a.time) + '</div>' +
       '<div class="appt-info">' +
         '<div class="p-name">' + esc(a.fio) + '</div>' +
-        '<div class="p-meta">Карта №' + esc(a.card||'—') +
-          ' · Полис: ' + esc(a.polis||'—') +
-          ' · Тел.: ' + esc(a.phone||'—') + '</div>' +
-        '<div class="p-reason">Причина: ' + esc(a.reason||'не указана') +
+        '<div class="p-meta">Карта №' + esc(a.card || '—') +
+          ' · Полис: ' + esc(a.polis || '—') +
+          ' · Тел.: ' + esc(a.phone || '—') + '</div>' +
+        '<div class="p-reason">Причина: ' + esc(a.reason || 'не указана') +
           (doc ? ' · каб. ' + doc.room : '') + '</div>' +
         ref +
       '</div>' +
-      '<button class="btn btn-outline" onclick="openRefModal(\'' + a.id + '\')">К другому врачу</button>' +
+      '<button class="btn btn-outline" onclick="openRefModal(\'' + a.__id + '\')">К другому врачу</button>' +
     '</div>';
   }).join('');
+
+  updateDebug();
+}
+
+function updateDebug(){
+  document.getElementById('debugInfo').textContent =
+    'debug: всего в базе ' + lastDebug.total +
+    ' · по этому врачу ' + lastDebug.myDoctor +
+    ' · на эту дату ' + lastDebug.myDate +
+    ' · активных ' + lastDebug.active +
+    ' · currentDoctor=' + (currentDoctor || '—');
 }
 
 function renderRefs(){
   const list = document.getElementById('refList');
   const items = Object.entries(appointments)
-    .map(([id,a])=>({id, ...a}))
-    .filter(a=>a.referralFrom === currentDoctor && a.status !== 'cancelled')
-    .sort((a,b)=>(b.date+b.time).localeCompare(a.date+a.time));
+    .map(([id,a])=>({...a, __id:id}))
+    .filter(a=>String(a.referralFrom || '') === String(currentDoctor)
+            && String(a.status || 'active') !== 'cancelled')
+    .sort((a,b)=>String((b.date||'')+(b.time||'')).localeCompare(String((a.date||'')+(a.time||''))));
 
   if(!items.length){
     list.innerHTML = '<div class="empty"><div class="icon">📤</div>' +
@@ -377,28 +448,28 @@ function renderRefs(){
   }
 
   list.innerHTML = items.map(a=>{
-    const d = DOCTORS.find(x=>x.id===a.doctorId);
+    const d = DOCTORS.find(x=>x.id === a.doctorId);
     return '<div class="ref-item">' +
       '<div class="p-name">' + esc(a.fio) +
         ' <span style="color:#64748b; font-weight:500; font-size:12.5px">· карта №' +
-        esc(a.card||'—') + '</span></div>' +
+        esc(a.card || '—') + '</span></div>' +
       '<div class="to-doc">→ ' + esc(d ? d.spec + ' ' + d.name : 'врач') +
         ', ' + esc(fmtDate(a.date)) + ' в ' + esc(a.time) +
         ', каб. ' + (d ? d.room : '—') + '</div>' +
-      '<div class="p-reason">Причина: ' + esc(a.reason||'не указана') + '</div>' +
+      '<div class="p-reason">Причина: ' + esc(a.reason || 'не указана') + '</div>' +
     '</div>';
   }).join('');
 }
 
 /* ============================================================
-   МОДАЛЬНОЕ ОКНО НАПРАВЛЕНИЯ
+   МОДАЛКА НАПРАВЛЕНИЯ
 ============================================================ */
 function openRefModal(apptId){
   const a = appointments[apptId];
   if(!a) return;
   refContext = apptId;
   document.getElementById('refModalSub').textContent =
-    'Пациент: ' + a.fio + ' (карта №' + (a.card||'—') + ')';
+    'Пациент: ' + a.fio + ' (карта №' + (a.card || '—') + ')';
 
   const sel = document.getElementById('refDoctor');
   sel.innerHTML = '<option value="">— выберите врача —</option>' +
@@ -422,9 +493,9 @@ function closeRefModal(){
 }
 
 function onRefFieldsChange(){
-  const docId   = document.getElementById('refDoctor').value;
+  const docId = document.getElementById('refDoctor').value;
   const dateStr = document.getElementById('refDate').value;
-  const tSel    = document.getElementById('refTime');
+  const tSel = document.getElementById('refTime');
   if(docId && dateStr){
     const slots = computeSlots(docId, dateStr).filter(s=>!s.busy);
     tSel.innerHTML = slots.length
@@ -451,7 +522,7 @@ function submitReferral(){
     });
   if(!ok) return;
 
-  if(computeSlots(docId, dateStr).some(s=>s.time===time && s.busy)){
+  if(computeSlots(docId, dateStr).some(s=>s.time === time && s.busy)){
     toast('Это время уже занято — выберите другое'); return;
   }
 
@@ -480,9 +551,6 @@ function submitReferral(){
   }).catch(err => toast('Ошибка: ' + err.message));
 }
 
-/* ============================================================
-   УТИЛИТА TOAST
-============================================================ */
 function toast(msg){
   const t = document.getElementById('toast');
   t.textContent = msg;
@@ -495,10 +563,23 @@ function toast(msg){
    FIREBASE LISTENERS
 ============================================================ */
 db.ref('patients').on('value', snap=>{ patients = snap.val() || {}; });
+
 db.ref('appointments').on('value', snap=>{
-  appointments = snap.val() || {};
+  const raw = snap.val() || {};
+  // Превращаем объект Firebase в массив с внутренним __id
+  appointments = {};
+  Object.entries(raw).forEach(([id, a])=>{
+    if(a && typeof a === 'object') appointments[id] = { ...a, __id: id };
+  });
+  console.log('[vrach] Firebase → appointments:', Object.keys(appointments).length, 'записей');
   if(refContext && !appointments[refContext]) refContext = null;
   renderAll();
+});
+
+db.ref('appointments').on('value', ()=>{}, err=>{
+  console.error('[vrach] Ошибка чтения appointments:', err);
+  document.getElementById('debugInfo').textContent =
+    '❌ Ошибка чтения Firebase: ' + err.message;
 });
 
 /* ============================================================
@@ -506,7 +587,7 @@ db.ref('appointments').on('value', snap=>{
 ============================================================ */
 document.getElementById('apptDate').value = todayStr();
 fillDoctorSelect();
-if(currentDoctor) renderAll();
+renderAll();  // вызываем всегда — покажет «выберите врача» если его нет
 </script>
 </body>
 </html>
