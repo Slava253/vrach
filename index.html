@@ -24,13 +24,13 @@
   .conn{display:inline-block; width:9px; height:9px; border-radius:50%;
     background:#f59e0b; margin-right:6px;}
   .conn.ok{background:#22c55e;} .conn.err{background:#ef4444;}
-  .tabs{max-width:1000px; margin:22px auto 0; padding:0 20px; display:flex; gap:10px;}
+  .tabs{max-width:1060px; margin:22px auto 0; padding:0 20px; display:flex; gap:10px;}
   .tab{flex:1; padding:13px; text-align:center; font-weight:700; font-size:14.5px;
     border-radius:12px 12px 0 0; background:#dbe4ef; color:#3b4a5f;
     cursor:pointer; transition:.2s; border:none; font-family:inherit;}
   .tab:hover{background:#cdd9e8;}
   .tab.active{background:#fff; color:#0e7490; box-shadow:0 -4px 12px rgba(0,0,0,.06);}
-  .container{max-width:1000px; margin:0 auto; padding:20px;}
+  .container{max-width:1060px; margin:0 auto; padding:20px;}
   .card{background:#fff; border-radius:16px; padding:22px;
     box-shadow:0 2px 12px rgba(15,42,74,.07); margin-bottom:18px;}
   .card h2{font-size:17px; font-weight:800; color:#0f2a4a;
@@ -52,6 +52,11 @@
     background:#fbfdff; transition:.2s;}
   .appt:hover{border-color:#0e7490; background:#f4fbfd;}
   .appt.referral{border-color:#f59e0b; background:#fffbeb;}
+  .appt.accepted{border-color:#10b981; background:#ecfdf5;}
+  .appt.accepted:hover{background:#dcfce7;}
+  .appt.accepted .time-badge{background:#059669;}
+  .appt.accepted.referral{border-color:#8b5cf6; background:#f5f3ff;}
+  .appt.accepted.referral .time-badge{background:#7c3aed;}
   .time-badge{background:#0e7490; color:#fff; font-weight:800; font-size:15px;
     padding:8px 13px; border-radius:9px; min-width:66px; text-align:center;}
   .appt.referral .time-badge{background:#d97706;}
@@ -60,13 +65,23 @@
   .p-meta{font-size:12.5px; color:#64748b; margin-top:3px; line-height:1.55;}
   .p-reason{font-size:13px; color:#334155; margin-top:4px;}
   .badge-ref{display:inline-block; background:#fef3c7; color:#92400e;
-    font-size:11.5px; font-weight:700; padding:3px 9px; border-radius:20px; margin-top:5px;}
+    font-size:11.5px; font-weight:700; padding:3px 9px; border-radius:20px;
+    margin-top:5px; margin-left:6px;}
+  .badge-accepted{display:inline-block; background:#d1fae5; color:#065f46;
+    font-size:11.5px; font-weight:700; padding:3px 9px; border-radius:20px;
+    margin-top:5px; margin-left:6px;}
+  .badge-forwarded{display:inline-block; background:#ede9fe; color:#5b21b6;
+    font-size:11.5px; font-weight:700; padding:3px 9px; border-radius:20px;
+    margin-top:5px; margin-left:6px;}
+  .appt-actions{display:flex; flex-direction:column; gap:6px; flex:none;}
   .btn{font-family:inherit; font-size:13.5px; font-weight:700;
     padding:9px 16px; border-radius:10px; border:none; cursor:pointer; transition:.2s;}
   .btn-outline{background:#fff; color:#0e7490; border:1.5px solid #0e7490;}
   .btn-outline:hover{background:#0e7490; color:#fff;}
   .btn-primary{background:linear-gradient(135deg,#0e7490,#1d4ed8); color:#fff;}
   .btn-primary:hover{filter:brightness(1.1);}
+  .btn-accept{background:linear-gradient(135deg,#059669,#10b981); color:#fff;}
+  .btn-accept:hover{filter:brightness(1.1);}
   .btn-ghost{background:#eef2f7; color:#475569;}
   .btn-ghost:hover{background:#e0e7f0;}
   .empty{text-align:center; padding:34px 16px; color:#8899aa;}
@@ -79,7 +94,7 @@
   .modal{background:#fff; border-radius:18px; max-width:480px; width:100%; padding:24px;
     box-shadow:0 20px 50px rgba(0,0,0,.25); max-height:90vh; overflow-y:auto;}
   .modal h3{font-size:18px; font-weight:800; color:#0f2a4a; margin-bottom:4px;}
-  .modal .m-sub{font-size:13px; color:#64748b; margin-bottom:16px;}
+  .modal .m-sub{font-size:13px; color:#64748b; margin-bottom:16px; line-height:1.5;}
   .form-row{margin-bottom:14px;}
   .form-row label{display:block; font-size:13px; font-weight:600;
     color:#3b4a5f; margin-bottom:6px;}
@@ -154,6 +169,7 @@
   </div>
 </div>
 
+<!-- МОДАЛКА НАПРАВЛЕНИЯ -->
 <div class="modal-overlay" id="refModal">
   <div class="modal">
     <h3>Записать к другому врачу</h3>
@@ -185,9 +201,13 @@
         <option>Профосмотр</option>
       </select>
     </div>
+    <div class="m-sub" style="margin-top:6px; color:#92400e; background:#fef3c7;
+      padding:10px 12px; border-radius:10px;">
+      ℹ️ После направления текущий приём автоматически будет отмечен как «Принят».
+    </div>
     <div class="modal-actions">
       <button class="btn btn-ghost" onclick="closeRefModal()">Отмена</button>
-      <button class="btn btn-primary" onclick="submitReferral()">Записать</button>
+      <button class="btn btn-primary" onclick="submitReferral()">Направить</button>
     </div>
   </div>
 </div>
@@ -239,7 +259,6 @@ const APPT_LEN = 5, BREAK_LEN = 3, STEP = APPT_LEN + BREAK_LEN, LUNCH_LEN = 15;
 let currentDoctor = localStorage.getItem('currentDoctor') || '';
 let patients = {}, appointments = {};
 let refContext = null;
-let lastDebug = { total: 0, myDoctor: 0, myDate: 0 };
 
 /* ============================================================
    УТИЛИТЫ
@@ -321,9 +340,6 @@ function switchTab(tab){
   renderAll();
 }
 
-/* ============================================================
-   ДАТА
-============================================================ */
 function shiftDate(days){
   const cur = document.getElementById('apptDate').value || todayStr();
   document.getElementById('apptDate').value = shiftDateStr(cur, days);
@@ -341,6 +357,7 @@ function renderAll(){
   if(!currentDoctor){
     document.getElementById('apptList').innerHTML =
       '<div class="empty"><div class="icon">🩺</div><p>Выберите себя в списке врачей справа сверху.</p></div>';
+    document.getElementById('statRow').innerHTML = '';
     return;
   }
   renderAppts();
@@ -355,57 +372,73 @@ function renderAppts(){
   const list = document.getElementById('apptList');
   const stats = document.getElementById('statRow');
 
-  // 🔍 Отладка: считаем сколько всего и на каждом шаге фильтра
-  const total = Object.values(appointments).length;
-  const myDoctorArr = Object.values(appointments)
-    .filter(a=>String(a.doctorId || '') === String(currentDoctor));
-  const myDateArr = myDoctorArr
-    .filter(a=>String(a.date || '') === String(dateStr));
-  const activeArr = myDateArr
-    .filter(a=>String(a.status || 'active') !== 'cancelled');
+  const allOnDay = Object.values(appointments)
+    .filter(a=>String(a.doctorId||'') === String(currentDoctor)
+            && String(a.date||'') === String(dateStr)
+            && String(a.status || 'active') !== 'cancelled');
 
-  lastDebug = {
-    total,
-    myDoctor: myDoctorArr.length,
-    myDate: myDateArr.length,
-    active: activeArr.length
-  };
-
-  const items = activeArr
+  const items = allOnDay
     .slice()
     .sort((a,b)=>String(a.time || '').localeCompare(String(b.time || '')));
 
+  const accepted = items.filter(a=>String(a.status||'active') === 'accepted');
+  const forwarded = items.filter(a=>a.forwardedTo);
+
   stats.innerHTML =
     '<div class="stat"><div class="num">' + items.length + '</div><div class="lbl">Приёмов на день</div></div>' +
-    '<div class="stat"><div class="num">' + items.filter(a=>a.referralFromName).length + '</div><div class="lbl">По направлению</div></div>' +
-    '<div class="stat"><div class="num">' + (items.length * APPT_LEN) + '</div><div class="lbl">Минут приёма</div></div>';
+    '<div class="stat" style="background:linear-gradient(135deg,#059669,#10b981);">' +
+      '<div class="num">' + accepted.length + ' / ' + items.length + '</div>' +
+      '<div class="lbl">Принято</div></div>' +
+    '<div class="stat" style="background:linear-gradient(135deg,#7c3aed,#8b5cf6);">' +
+      '<div class="num">' + forwarded.length + '</div>' +
+      '<div class="lbl">Направлено</div></div>';
 
   if(!items.length){
     let hint = '';
-    if(lastDebug.total === 0){
+    const total = Object.keys(appointments).length;
+    const mine = Object.values(appointments).filter(a=>String(a.doctorId||'') === String(currentDoctor));
+    if(total === 0){
       hint = 'В Firebase пока нет ни одной записи. Создайте запись в регистратуре.';
-    } else if(lastDebug.myDoctor === 0){
-      hint = 'Для врача «' + esc(doc ? doc.spec + ' ' + doc.name : currentDoctor) +
-             '» нет записей. Всего в базе: ' + lastDebug.total +
-             '. Возможно, запись к другому врачу.';
-    } else if(lastDebug.myDate === 0){
-      hint = 'У этого врача есть ' + lastDebug.myDoctor + ' записей, но на другую дату. ' +
-             'Попробуйте пролистать дни ◀ ▶ или нажать «Сегодня».';
+    } else if(mine.length === 0){
+      hint = 'Для этого врача нет записей вообще.';
     } else {
-      hint = 'Все записи этого врача на ' + fmtDate(dateStr) + ' отменены.';
+      hint = 'У вас есть ' + mine.length + ' записей, но на другие даты. Попробуйте ◀ ▶ или «Сегодня».';
     }
     list.innerHTML = '<div class="empty"><div class="icon">🗓️</div>' +
       '<p>На ' + fmtDate(dateStr) + ' записей нет.</p>' +
       '<div class="hint">' + hint + '</div></div>';
-    updateDebug();
+    document.getElementById('debugInfo').textContent =
+      'debug: всего в базе ' + total + ' · по врачу ' + mine.length +
+      ' · на дату 0 · currentDoctor=' + (currentDoctor || '—');
     return;
   }
 
   list.innerHTML = items.map(a=>{
-    const ref = a.referralFromName
+    const isAccepted = String(a.status||'active') === 'accepted';
+    const forwarded = !!a.forwardedTo;
+    const classes = 'appt' + (isAccepted ? ' accepted' : '') + (a.referralFromName ? ' referral' : '');
+
+    const refBadge = a.referralFromName
       ? '<span class="badge-ref">📤 Направление от: ' + esc(a.referralFromName) + '</span>'
       : '';
-    return '<div class="appt' + (a.referralFromName ? ' referral' : '') + '">' +
+    const acceptedBadge = isAccepted
+      ? '<span class="badge-accepted">✓ Принят</span>'
+      : '';
+    const forwardedBadge = forwarded
+      ? '<span class="badge-forwarded">→ Направлен: ' +
+        esc(a.forwardedToName || (DOCTORS.find(x=>x.id===a.forwardedTo)?.spec || 'врачу')) +
+        ' · ' + esc(fmtDate(a.referralDate || '')) + ' ' + esc(a.referralTime || '') + '</span>'
+      : '';
+
+    const acceptBtn = isAccepted
+      ? ''
+      : '<button class="btn btn-accept" onclick="acceptAppt(\'' + a.__id + '\')">✓ Принять</button>';
+
+    const forwardBtn = forwarded
+      ? ''
+      : '<button class="btn btn-outline" onclick="openRefModal(\'' + a.__id + '\')">→ К другому</button>';
+
+    return '<div class="' + classes + '">' +
       '<div class="time-badge">' + esc(a.time) + '</div>' +
       '<div class="appt-info">' +
         '<div class="p-name">' + esc(a.fio) + '</div>' +
@@ -414,21 +447,16 @@ function renderAppts(){
           ' · Тел.: ' + esc(a.phone || '—') + '</div>' +
         '<div class="p-reason">Причина: ' + esc(a.reason || 'не указана') +
           (doc ? ' · каб. ' + doc.room : '') + '</div>' +
-        ref +
+        refBadge + acceptedBadge + forwardedBadge +
       '</div>' +
-      '<button class="btn btn-outline" onclick="openRefModal(\'' + a.__id + '\')">К другому врачу</button>' +
+      '<div class="appt-actions">' + acceptBtn + forwardBtn + '</div>' +
     '</div>';
   }).join('');
 
-  updateDebug();
-}
-
-function updateDebug(){
   document.getElementById('debugInfo').textContent =
-    'debug: всего в базе ' + lastDebug.total +
-    ' · по этому врачу ' + lastDebug.myDoctor +
-    ' · на эту дату ' + lastDebug.myDate +
-    ' · активных ' + lastDebug.active +
+    'debug: всего в базе ' + Object.keys(appointments).length +
+    ' · на дату ' + items.length +
+    ' · принято ' + accepted.length +
     ' · currentDoctor=' + (currentDoctor || '—');
 }
 
@@ -443,7 +471,7 @@ function renderRefs(){
   if(!items.length){
     list.innerHTML = '<div class="empty"><div class="icon">📤</div>' +
       '<p>Вы пока не направляли пациентов к коллегам.<br>' +
-      'Откройте «Приёмы» и нажмите «К другому врачу».</p></div>';
+      'Откройте «Приёмы» и нажмите «→ К другому».</p></div>';
     return;
   }
 
@@ -459,6 +487,24 @@ function renderRefs(){
       '<div class="p-reason">Причина: ' + esc(a.reason || 'не указана') + '</div>' +
     '</div>';
   }).join('');
+}
+
+/* ============================================================
+   ПРИНЯТЬ ПАЦИЕНТА
+============================================================ */
+function acceptAppt(id){
+  const a = appointments[id];
+  if(!a) return;
+  if(String(a.status || 'active') === 'accepted'){
+    toast('Приём уже принят'); return;
+  }
+  db.ref('appointments/' + id).update({
+    status: 'accepted',
+    acceptedAt: Date.now(),
+    acceptedBy: currentDoctor
+  }).then(()=>{
+    toast('Пациент ' + a.fio + ' принят');
+  }).catch(err => toast('Ошибка: ' + err.message));
 }
 
 /* ============================================================
@@ -529,8 +575,10 @@ function submitReferral(){
   const src = appointments[refContext];
   const srcDoc = DOCTORS.find(d=>d.id === currentDoctor);
   const target = DOCTORS.find(d=>d.id === docId);
+  const targetName = target ? (target.spec + ' ' + target.name) : '';
 
-  db.ref('appointments').push({
+  // 1) Создаём новую запись у целевого врача
+  const newAppt = {
     doctorId: docId,
     patientId: src.patientId || '',
     fio: src.fio,
@@ -544,9 +592,25 @@ function submitReferral(){
     referralFromName: srcDoc ? (srcDoc.spec + ' ' + srcDoc.name) : '',
     status: 'active',
     createdAt: Date.now()
+  };
+
+  // 2) Исходную запись помечаем принятой + отмечаем, куда направили
+  const updates = {};
+  updates['appointments/' + refContext + '/status']      = 'accepted';
+  updates['appointments/' + refContext + '/acceptedAt']  = Date.now();
+  updates['appointments/' + refContext + '/acceptedBy']  = currentDoctor;
+  updates['appointments/' + refContext + '/forwardedTo'] = docId;
+  updates['appointments/' + refContext + '/forwardedToName'] = targetName;
+  updates['appointments/' + refContext + '/referralDate'] = dateStr;
+  updates['appointments/' + refContext + '/referralTime'] = time;
+  updates['appointments/' + refContext + '/forwardedAt']  = Date.now();
+
+  // Атомарно: push + update через транзакцию необязательно, делаем последовательно
+  db.ref('appointments').push(newAppt).then(()=>{
+    return db.ref().update(updates);
   }).then(()=>{
     closeRefModal();
-    toast('Пациент записан к ' + (target ? target.spec : 'врачу') +
+    toast('Пациент принят и направлен к ' + (target ? target.spec : 'врачу') +
       ' на ' + fmtDate(dateStr) + ' в ' + time);
   }).catch(err => toast('Ошибка: ' + err.message));
 }
@@ -566,20 +630,12 @@ db.ref('patients').on('value', snap=>{ patients = snap.val() || {}; });
 
 db.ref('appointments').on('value', snap=>{
   const raw = snap.val() || {};
-  // Превращаем объект Firebase в массив с внутренним __id
   appointments = {};
   Object.entries(raw).forEach(([id, a])=>{
     if(a && typeof a === 'object') appointments[id] = { ...a, __id: id };
   });
-  console.log('[vrach] Firebase → appointments:', Object.keys(appointments).length, 'записей');
   if(refContext && !appointments[refContext]) refContext = null;
   renderAll();
-});
-
-db.ref('appointments').on('value', ()=>{}, err=>{
-  console.error('[vrach] Ошибка чтения appointments:', err);
-  document.getElementById('debugInfo').textContent =
-    '❌ Ошибка чтения Firebase: ' + err.message;
 });
 
 /* ============================================================
@@ -587,7 +643,7 @@ db.ref('appointments').on('value', ()=>{}, err=>{
 ============================================================ */
 document.getElementById('apptDate').value = todayStr();
 fillDoctorSelect();
-renderAll();  // вызываем всегда — покажет «выберите врача» если его нет
+renderAll();
 </script>
 </body>
 </html>
