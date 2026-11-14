@@ -47,7 +47,8 @@
   .toolbar .btn-nav:hover{background:#e6f7f9; border-color:#0e7490;}
   .debug{font-size:12px; color:#94a3b8; margin-top:8px; font-family:monospace;
     background:#f8fafc; padding:8px 12px; border-radius:8px; border:1px dashed #e2e8f0;}
-  .appt{display:flex; align-items:center; gap:14px; padding:14px 16px;
+
+  .appt{display:flex; gap:14px; padding:14px 16px;
     border:1.5px solid #e3eaf2; border-radius:12px; margin-bottom:10px;
     background:#fbfdff; transition:.2s;}
   .appt:hover{border-color:#0e7490; background:#f4fbfd;}
@@ -55,55 +56,106 @@
   .appt.accepted{border-color:#10b981; background:#ecfdf5;}
   .appt.accepted:hover{background:#dcfce7;}
   .appt.accepted .time-badge{background:#059669;}
-  .appt.accepted.referral{border-color:#8b5cf6; background:#f5f3ff;}
-  .appt.accepted.referral .time-badge{background:#7c3aed;}
+  .appt.in_progress{border-color:#3b82f6; background:#eff6ff;}
+  .appt.in_progress .time-badge{background:#2563eb;}
+  .appt.completed{border-color:#94a3b8; background:#f1f5f9; opacity:.92;}
+  .appt.completed .time-badge{background:#64748b;}
+  .appt.completed .p-name{color:#475569;}
   .time-badge{background:#0e7490; color:#fff; font-weight:800; font-size:15px;
-    padding:8px 13px; border-radius:9px; min-width:66px; text-align:center;}
-  .appt.referral .time-badge{background:#d97706;}
-  .appt-info{flex:1; min-width:0;}
+    padding:8px 13px; border-radius:9px; min-width:66px; text-align:center;
+    align-self:flex-start; flex:none;}
+  .appt-main{flex:1; min-width:0; display:flex; flex-direction:column; gap:6px;}
+  .appt-info{min-width:0;}
   .p-name{font-weight:700; font-size:15px; color:#0f2a4a;}
   .p-meta{font-size:12.5px; color:#64748b; margin-top:3px; line-height:1.55;}
   .p-reason{font-size:13px; color:#334155; margin-top:4px;}
-  .badge-ref{display:inline-block; background:#fef3c7; color:#92400e;
-    font-size:11.5px; font-weight:700; padding:3px 9px; border-radius:20px;
-    margin-top:5px; margin-left:6px;}
-  .badge-accepted{display:inline-block; background:#d1fae5; color:#065f46;
-    font-size:11.5px; font-weight:700; padding:3px 9px; border-radius:20px;
-    margin-top:5px; margin-left:6px;}
-  .badge-forwarded{display:inline-block; background:#ede9fe; color:#5b21b6;
-    font-size:11.5px; font-weight:700; padding:3px 9px; border-radius:20px;
-    margin-top:5px; margin-left:6px;}
-  .appt-actions{display:flex; flex-direction:column; gap:6px; flex:none;}
-  .btn{font-family:inherit; font-size:13.5px; font-weight:700;
-    padding:9px 16px; border-radius:10px; border:none; cursor:pointer; transition:.2s;}
+  .badges{display:flex; flex-wrap:wrap; gap:5px; margin-top:6px;}
+  .badge-ref,.badge-accepted,.badge-in_progress,.badge-completed,.badge-forwarded{
+    display:inline-block; font-size:11.5px; font-weight:700;
+    padding:3px 9px; border-radius:20px;}
+  .badge-ref{background:#fef3c7; color:#92400e;}
+  .badge-accepted{background:#d1fae5; color:#065f46;}
+  .badge-in_progress{background:#dbeafe; color:#1e40af;}
+  .badge-completed{background:#e2e8f0; color:#334155;}
+  .badge-forwarded{background:#ede9fe; color:#5b21b6;}
+
+  .exam-summary{background:#fff; border:1px dashed #cbd5e1; border-radius:9px;
+    padding:9px 12px; font-size:12.5px; color:#334155; line-height:1.55; margin-top:4px;}
+  .exam-summary .exam-line{margin-top:2px;}
+  .exam-summary .exam-line:first-child{margin-top:0;}
+  .exam-summary .exam-line .lbl{color:#64748b; font-weight:600;}
+
+  .appt-actions{display:flex; flex-direction:column; gap:6px; flex:none; min-width:150px;}
+  .btn{font-family:inherit; font-size:13px; font-weight:700;
+    padding:9px 14px; border-radius:10px; border:none; cursor:pointer;
+    transition:.2s; white-space:nowrap;}
   .btn-outline{background:#fff; color:#0e7490; border:1.5px solid #0e7490;}
   .btn-outline:hover{background:#0e7490; color:#fff;}
   .btn-primary{background:linear-gradient(135deg,#0e7490,#1d4ed8); color:#fff;}
   .btn-primary:hover{filter:brightness(1.1);}
   .btn-accept{background:linear-gradient(135deg,#059669,#10b981); color:#fff;}
   .btn-accept:hover{filter:brightness(1.1);}
+  .btn-exam{background:linear-gradient(135deg,#7c3aed,#a855f7); color:#fff;}
+  .btn-exam:hover{filter:brightness(1.1);}
+  .btn-complete{background:linear-gradient(135deg,#059669,#047857); color:#fff;}
+  .btn-complete:hover{filter:brightness(1.1);}
+  .btn-view{background:#fff; color:#475569; border:1.5px solid #94a3b8;}
+  .btn-view:hover{background:#f1f5f9;}
   .btn-ghost{background:#eef2f7; color:#475569;}
   .btn-ghost:hover{background:#e0e7f0;}
+
   .empty{text-align:center; padding:34px 16px; color:#8899aa;}
   .empty .icon{font-size:40px; margin-bottom:8px;}
   .empty p{font-size:14.5px; line-height:1.55;}
   .empty .hint{font-size:13px; color:#64748b; margin-top:8px;}
+
   .modal-overlay{display:none; position:fixed; inset:0; background:rgba(15,42,74,.45);
     z-index:50; align-items:center; justify-content:center; padding:20px;}
   .modal-overlay.open{display:flex;}
-  .modal{background:#fff; border-radius:18px; max-width:480px; width:100%; padding:24px;
-    box-shadow:0 20px 50px rgba(0,0,0,.25); max-height:90vh; overflow-y:auto;}
+  .modal{background:#fff; border-radius:18px; max-width:600px; width:100%; padding:24px;
+    box-shadow:0 20px 50px rgba(0,0,0,.25); max-height:92vh; overflow-y:auto;}
   .modal h3{font-size:18px; font-weight:800; color:#0f2a4a; margin-bottom:4px;}
   .modal .m-sub{font-size:13px; color:#64748b; margin-bottom:16px; line-height:1.5;}
-  .form-row{margin-bottom:14px;}
+  .form-row{margin-bottom:12px;}
   .form-row label{display:block; font-size:13px; font-weight:600;
     color:#3b4a5f; margin-bottom:6px;}
-  .form-row select,.form-row input{width:100%; padding:11px 12px;
+  .form-row select,.form-row input,.form-row textarea{width:100%; padding:11px 12px;
     border:1.5px solid #d5dee9; border-radius:10px; font-family:inherit;
     font-size:14px; color:#0f2a4a; outline:none; background:#f8fafd;}
-  .form-row select:focus,.form-row input:focus{border-color:#0e7490; background:#fff;}
+  .form-row textarea{resize:vertical; min-height:68px; line-height:1.5;}
+  .form-row select:focus,.form-row input:focus,.form-row textarea:focus{
+    border-color:#0e7490; background:#fff;}
   .form-row .err{border-color:#ef4444 !important; background:#fef2f2 !important;}
-  .modal-actions{display:flex; gap:10px; justify-content:flex-end; margin-top:18px;}
+  .modal-actions{display:flex; gap:10px; justify-content:flex-end; margin-top:18px;
+    flex-wrap:wrap;}
+  .modal-note{background:#f0f9ff; color:#0c4a6e; padding:10px 12px;
+    border-radius:10px; font-size:12.5px; line-height:1.55; margin-bottom:14px;}
+  .modal-note.warn{background:#fef3c7; color:#92400e;}
+  .modal-note.ok{background:#d1fae5; color:#065f46;}
+
+  /* === Мульти-режим для профосмотра === */
+  .multi-row{display:flex; flex-wrap:wrap; gap:8px; align-items:center;
+    padding:10px; background:#f8fafc; border:1.5px solid #e2e8f0;
+    border-radius:10px; margin-bottom:8px;}
+  .multi-row select,.multi-row input{padding:9px 10px; font-size:13px;
+    border:1.5px solid #d5dee9; border-radius:8px; background:#fff;
+    color:#0f2a4a; outline:none; font-family:inherit;}
+  .multi-row select:focus,.multi-row input:focus{border-color:#0e7490;}
+  .multi-row .m-doctor{flex:1 1 170px; min-width:0;}
+  .multi-row .m-date{flex:0 0 130px;}
+  .multi-row .m-time{flex:0 0 100px;}
+  .multi-row .m-remove{flex:none; width:34px; height:34px; padding:0;
+    border-radius:8px; border:1.5px solid #fecaca; background:#fef2f2;
+    color:#dc2626; font-size:18px; font-weight:800; cursor:pointer;
+    display:flex; align-items:center; justify-content:center; font-family:inherit;}
+  .multi-row .m-remove:hover{background:#fee2e2;}
+  .multi-empty{font-size:13px; color:#94a3b8; text-align:center; padding:14px;
+    background:#f8fafc; border-radius:10px; border:1px dashed #cbd5e1;}
+  .multi-add{background:#fff; color:#0e7490; border:1.5px dashed #0e7490;
+    border-radius:10px; padding:9px 14px; font-family:inherit; font-weight:700;
+    font-size:13px; cursor:pointer; transition:.15s; width:100%; margin-top:4px;}
+  .multi-add:hover{background:#e6f7f9;}
+
   .ref-item{border:1.5px solid #e3eaf2; border-radius:12px; padding:14px 16px;
     margin-bottom:10px; background:#fbfdff;}
   .ref-item .to-doc{font-weight:700; color:#b45309; font-size:13.5px; margin-top:4px;}
@@ -112,6 +164,7 @@
     color:#fff; border-radius:12px; padding:14px 16px;}
   .stat .num{font-size:24px; font-weight:800;}
   .stat .lbl{font-size:12px; opacity:.85; margin-top:2px;}
+
   .toast{position:fixed; bottom:24px; left:50%;
     transform:translateX(-50%) translateY(80px);
     background:#134e4a; color:#fff; padding:12px 22px; border-radius:12px;
@@ -169,26 +222,43 @@
   </div>
 </div>
 
+<!-- МОДАЛКА ОСМОТРА -->
+<div class="modal-overlay" id="examModal">
+  <div class="modal">
+    <h3 id="examTitle">📝 Осмотр пациента</h3>
+    <div class="m-sub" id="examModalSub"></div>
+    <div id="examStatusNote"></div>
+
+    <div class="form-row">
+      <label>Жалобы пациента</label>
+      <textarea id="examComplaints" placeholder="На что жалуется пациент…"></textarea>
+    </div>
+    <div class="form-row">
+      <label>Диагноз</label>
+      <textarea id="examDiagnosis" placeholder="Поставленный диагноз…"></textarea>
+    </div>
+    <div class="form-row">
+      <label>Назначения (лекарства, процедуры, анализы)</label>
+      <textarea id="examPrescriptions" placeholder="Например: Парацетамол 500 мг — 3 раза в день, 5 дней…"></textarea>
+    </div>
+    <div class="form-row">
+      <label>Рекомендации</label>
+      <textarea id="examRecommendations" placeholder="Режим, диета, повторный приём…"></textarea>
+    </div>
+
+    <div class="modal-actions" id="examActions"></div>
+  </div>
+</div>
+
 <!-- МОДАЛКА НАПРАВЛЕНИЯ -->
 <div class="modal-overlay" id="refModal">
   <div class="modal">
     <h3>Записать к другому врачу</h3>
     <div class="m-sub" id="refModalSub"></div>
-    <div class="form-row">
-      <label>К какому врачу</label>
-      <select id="refDoctor" onchange="onRefFieldsChange()"></select>
-    </div>
-    <div class="form-row">
-      <label>Дата приёма</label>
-      <input type="date" id="refDate" onchange="onRefFieldsChange()">
-    </div>
-    <div class="form-row">
-      <label>Время (свободные слоты)</label>
-      <select id="refTime"><option value="">— выберите дату и врача —</option></select>
-    </div>
+
     <div class="form-row">
       <label>Причина приёма</label>
-      <select id="refReason">
+      <select id="refReason" onchange="onRefReasonChange()">
         <option value="">— выберите причину —</option>
         <option>Первичный осмотр</option>
         <option>Повторный приём</option>
@@ -201,9 +271,35 @@
         <option>Профосмотр</option>
       </select>
     </div>
-    <div class="m-sub" style="margin-top:6px; color:#92400e; background:#fef3c7;
-      padding:10px 12px; border-radius:10px;">
-      ℹ️ После направления текущий приём автоматически будет отмечен как «Принят».
+
+    <!-- Единичное направление -->
+    <div id="refSingleSection">
+      <div class="form-row">
+        <label>К какому врачу</label>
+        <select id="refDoctor" onchange="onRefFieldsChange()"></select>
+      </div>
+      <div class="form-row">
+        <label>Дата приёма</label>
+        <input type="date" id="refDate" onchange="onRefFieldsChange()">
+      </div>
+      <div class="form-row">
+        <label>Время (свободные слоты)</label>
+        <select id="refTime"><option value="">— выберите дату и врача —</option></select>
+      </div>
+    </div>
+
+    <!-- Множественное направление (профосмотр) -->
+    <div id="refMultiSection" style="display:none">
+      <div class="modal-note">
+        🩺 Профосмотр — можно записать пациента сразу к нескольким врачам.
+        Для каждого выберите специалиста, дату и свободное время.
+      </div>
+      <div id="refMultiList"></div>
+      <button type="button" class="multi-add" onclick="addMultiDoctorRow()">+ Добавить врача</button>
+    </div>
+
+    <div class="modal-note warn" id="refForwardNote" style="margin-top:14px">
+      ℹ️ После отправки текущий приём будет отмечен как «Принят».
     </div>
     <div class="modal-actions">
       <button class="btn btn-ghost" onclick="closeRefModal()">Отмена</button>
@@ -259,6 +355,8 @@ const APPT_LEN = 5, BREAK_LEN = 3, STEP = APPT_LEN + BREAK_LEN, LUNCH_LEN = 15;
 let currentDoctor = localStorage.getItem('currentDoctor') || '';
 let patients = {}, appointments = {};
 let refContext = null;
+let examContext = null;
+let multiRows = [];  // [{doctorId, date, time}] для профосмотра
 
 /* ============================================================
    УТИЛИТЫ
@@ -266,6 +364,12 @@ let refContext = null;
 function pad(n){ return String(n).padStart(2,'0'); }
 function fmtTime(t){ return pad(Math.floor(t/60)) + ':' + pad(t%60); }
 function fmtDate(ds){ return ds ? ds.split('-').reverse().join('.') : ''; }
+function fmtDateTime(ts){
+  if(!ts) return '';
+  const d = new Date(ts);
+  return pad(d.getHours()) + ':' + pad(d.getMinutes()) + ' ' +
+    pad(d.getDate()) + '.' + pad(d.getMonth()+1) + '.' + d.getFullYear();
+}
 function todayStr(){
   const d = new Date();
   return d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate());
@@ -284,6 +388,16 @@ function esc(s){
   return String(s==null?'':s).replace(/[&<>"']/g,c=>({
     '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
   }[c]));
+}
+function truncate(s, n){
+  s = String(s || '').trim();
+  return s.length > n ? s.slice(0, n-1) + '…' : s;
+}
+function plural(n, one, few, many){
+  const m10 = n % 10, m100 = n % 100;
+  if(m10 === 1 && m100 !== 11) return one;
+  if(m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14)) return few;
+  return many;
 }
 
 /* ============================================================
@@ -339,7 +453,6 @@ function switchTab(tab){
   document.getElementById('tabRefs').classList.toggle('active',  tab === 'refs');
   renderAll();
 }
-
 function shiftDate(days){
   const cur = document.getElementById('apptDate').value || todayStr();
   document.getElementById('apptDate').value = shiftDateStr(cur, days);
@@ -364,6 +477,11 @@ function renderAll(){
   renderRefs();
 }
 
+function hasExamData(a){
+  return a && a.exam && (a.exam.complaints || a.exam.diagnosis ||
+    a.exam.prescriptions || a.exam.recommendations);
+}
+
 function renderAppts(){
   const dateStr = document.getElementById('apptDate').value || todayStr();
   document.getElementById('dayName').textContent = '· ' + dayName(dateStr);
@@ -372,25 +490,30 @@ function renderAppts(){
   const list = document.getElementById('apptList');
   const stats = document.getElementById('statRow');
 
-  const allOnDay = Object.values(appointments)
+  const items = Object.values(appointments)
     .filter(a=>String(a.doctorId||'') === String(currentDoctor)
             && String(a.date||'') === String(dateStr)
-            && String(a.status || 'active') !== 'cancelled');
-
-  const items = allOnDay
+            && String(a.status || 'active') !== 'cancelled')
     .slice()
     .sort((a,b)=>String(a.time || '').localeCompare(String(b.time || '')));
 
-  const accepted = items.filter(a=>String(a.status||'active') === 'accepted');
-  const forwarded = items.filter(a=>a.forwardedTo);
+  const acceptedCount = items.filter(a=>{
+    const s = String(a.status || 'active');
+    return s === 'accepted' || s === 'in_progress' || s === 'completed';
+  }).length;
+  const completedCount = items.filter(a=>String(a.status || 'active') === 'completed').length;
+  const forwardedCount = items.filter(a=>a.forwardedTo).length;
 
   stats.innerHTML =
     '<div class="stat"><div class="num">' + items.length + '</div><div class="lbl">Приёмов на день</div></div>' +
     '<div class="stat" style="background:linear-gradient(135deg,#059669,#10b981);">' +
-      '<div class="num">' + accepted.length + ' / ' + items.length + '</div>' +
+      '<div class="num">' + acceptedCount + ' / ' + items.length + '</div>' +
       '<div class="lbl">Принято</div></div>' +
+    '<div class="stat" style="background:linear-gradient(135deg,#475569,#64748b);">' +
+      '<div class="num">' + completedCount + '</div>' +
+      '<div class="lbl">Завершено</div></div>' +
     '<div class="stat" style="background:linear-gradient(135deg,#7c3aed,#8b5cf6);">' +
-      '<div class="num">' + forwarded.length + '</div>' +
+      '<div class="num">' + forwardedCount + '</div>' +
       '<div class="lbl">Направлено</div></div>';
 
   if(!items.length){
@@ -414,49 +537,86 @@ function renderAppts(){
   }
 
   list.innerHTML = items.map(a=>{
-    const isAccepted = String(a.status||'active') === 'accepted';
+    const status = String(a.status || 'active');
+    const isCompleted = status === 'completed';
+    const isInProgress = status === 'in_progress';
+    const isAccepted = status === 'accepted';
     const forwarded = !!a.forwardedTo;
-    const classes = 'appt' + (isAccepted ? ' accepted' : '') + (a.referralFromName ? ' referral' : '');
 
-    const refBadge = a.referralFromName
-      ? '<span class="badge-ref">📤 Направление от: ' + esc(a.referralFromName) + '</span>'
-      : '';
-    const acceptedBadge = isAccepted
-      ? '<span class="badge-accepted">✓ Принят</span>'
-      : '';
-    const forwardedBadge = forwarded
-      ? '<span class="badge-forwarded">→ Направлен: ' +
-        esc(a.forwardedToName || (DOCTORS.find(x=>x.id===a.forwardedTo)?.spec || 'врачу')) +
-        ' · ' + esc(fmtDate(a.referralDate || '')) + ' ' + esc(a.referralTime || '') + '</span>'
-      : '';
+    let cls = 'appt';
+    if(isCompleted) cls += ' completed';
+    else if(isInProgress) cls += ' in_progress';
+    else if(isAccepted) cls += ' accepted';
+    if(a.referralFromName && !isCompleted) cls += ' referral';
 
-    const acceptBtn = isAccepted
-      ? ''
-      : '<button class="btn btn-accept" onclick="acceptAppt(\'' + a.__id + '\')">✓ Принять</button>';
+    const badges = [];
+    if(a.referralFromName) badges.push('<span class="badge-ref">📤 от: ' + esc(a.referralFromName) + '</span>');
+    if(isAccepted)   badges.push('<span class="badge-accepted">✓ Принят</span>');
+    if(isInProgress) badges.push('<span class="badge-in_progress">✎ Идёт осмотр</span>');
+    if(isCompleted)  badges.push('<span class="badge-completed">✓ Завершён</span>');
 
-    const forwardBtn = forwarded
-      ? ''
-      : '<button class="btn btn-outline" onclick="openRefModal(\'' + a.__id + '\')">→ К другому</button>';
+    // Бейдж «Направлен» — с учётом мульти-направления (профосмотр)
+    if(a.forwardedCount && a.forwardedCount > 1){
+      badges.push('<span class="badge-forwarded">→ Профосмотр: ' +
+        a.forwardedCount + ' ' + plural(a.forwardedCount,'врач','врача','врачей') + '</span>');
+    } else if(forwarded){
+      badges.push('<span class="badge-forwarded">→ ' +
+        esc(a.forwardedToName || 'другому врачу') +
+        (a.referralDate ? ' · ' + esc(fmtDate(a.referralDate)) + ' ' + esc(a.referralTime || '') : '') +
+        '</span>');
+    }
 
-    return '<div class="' + classes + '">' +
+    // Превью осмотра
+    let examSummary = '';
+    if(hasExamData(a)){
+      const lines = [];
+      if(a.exam.diagnosis) lines.push('<div class="exam-line"><span class="lbl">Диагноз:</span> ' + esc(truncate(a.exam.diagnosis, 120)) + '</div>');
+      if(a.exam.prescriptions) lines.push('<div class="exam-line"><span class="lbl">Назначено:</span> ' + esc(truncate(a.exam.prescriptions, 120)) + '</div>');
+      if(a.exam.recommendations) lines.push('<div class="exam-line"><span class="lbl">Рекомендации:</span> ' + esc(truncate(a.exam.recommendations, 100)) + '</div>');
+      if(!lines.length && a.exam.complaints){
+        lines.push('<div class="exam-line"><span class="lbl">Жалобы:</span> ' + esc(truncate(a.exam.complaints, 120)) + '</div>');
+      }
+      if(lines.length) examSummary = '<div class="exam-summary">' + lines.join('') + '</div>';
+    }
+
+    // Кнопки
+    const actionBtns = [];
+    if(!isCompleted && !isAccepted && !isInProgress){
+      actionBtns.push('<button class="btn btn-accept" onclick="acceptAppt(\'' + a.__id + '\')">✓ Принять</button>');
+    }
+    if(isCompleted){
+      actionBtns.push('<button class="btn btn-view" onclick="openExamModal(\'' + a.__id + '\')">📋 Просмотр осмотра</button>');
+    } else {
+      const examLabel = hasExamData(a) ? '📝 Продолжить осмотр' : '📝 Осмотр';
+      actionBtns.push('<button class="btn btn-exam" onclick="openExamModal(\'' + a.__id + '\')">' + examLabel + '</button>');
+    }
+    if(!forwarded){
+      actionBtns.push('<button class="btn btn-outline" onclick="openRefModal(\'' + a.__id + '\')">→ К другому</button>');
+    }
+
+    return '<div class="' + cls + '">' +
       '<div class="time-badge">' + esc(a.time) + '</div>' +
-      '<div class="appt-info">' +
-        '<div class="p-name">' + esc(a.fio) + '</div>' +
-        '<div class="p-meta">Карта №' + esc(a.card || '—') +
-          ' · Полис: ' + esc(a.polis || '—') +
-          ' · Тел.: ' + esc(a.phone || '—') + '</div>' +
-        '<div class="p-reason">Причина: ' + esc(a.reason || 'не указана') +
-          (doc ? ' · каб. ' + doc.room : '') + '</div>' +
-        refBadge + acceptedBadge + forwardedBadge +
+      '<div class="appt-main">' +
+        '<div class="appt-info">' +
+          '<div class="p-name">' + esc(a.fio) + '</div>' +
+          '<div class="p-meta">Карта №' + esc(a.card || '—') +
+            ' · Полис: ' + esc(a.polis || '—') +
+            ' · Тел.: ' + esc(a.phone || '—') + '</div>' +
+          '<div class="p-reason">Причина: ' + esc(a.reason || 'не указана') +
+            (doc ? ' · каб. ' + doc.room : '') + '</div>' +
+          (badges.length ? '<div class="badges">' + badges.join('') + '</div>' : '') +
+        '</div>' +
+        examSummary +
       '</div>' +
-      '<div class="appt-actions">' + acceptBtn + forwardBtn + '</div>' +
+      '<div class="appt-actions">' + actionBtns.join('') + '</div>' +
     '</div>';
   }).join('');
 
   document.getElementById('debugInfo').textContent =
     'debug: всего в базе ' + Object.keys(appointments).length +
     ' · на дату ' + items.length +
-    ' · принято ' + accepted.length +
+    ' · принято ' + acceptedCount +
+    ' · завершено ' + completedCount +
     ' · currentDoctor=' + (currentDoctor || '—');
 }
 
@@ -490,12 +650,13 @@ function renderRefs(){
 }
 
 /* ============================================================
-   ПРИНЯТЬ ПАЦИЕНТА
+   ПРИНЯТЬ
 ============================================================ */
 function acceptAppt(id){
   const a = appointments[id];
   if(!a) return;
-  if(String(a.status || 'active') === 'accepted'){
+  const s = String(a.status || 'active');
+  if(s === 'accepted' || s === 'in_progress' || s === 'completed'){
     toast('Приём уже принят'); return;
   }
   db.ref('appointments/' + id).update({
@@ -508,7 +669,109 @@ function acceptAppt(id){
 }
 
 /* ============================================================
-   МОДАЛКА НАПРАВЛЕНИЯ
+   ОСМОТР
+============================================================ */
+function openExamModal(id){
+  const a = appointments[id];
+  if(!a) return;
+  examContext = id;
+
+  const status = String(a.status || 'active');
+  const isCompleted = status === 'completed';
+  const doc = DOCTORS.find(d=>d.id === a.doctorId);
+
+  document.getElementById('examTitle').textContent =
+    isCompleted ? '📋 Осмотр пациента' : '📝 Осмотр пациента';
+  document.getElementById('examModalSub').textContent =
+    a.fio + ' · карта №' + (a.card || '—') +
+    ' · ' + fmtDate(a.date) + ' в ' + a.time +
+    (doc ? ' · каб. ' + doc.room : '');
+
+  const ex = a.exam || {};
+  document.getElementById('examComplaints').value      = ex.complaints || '';
+  document.getElementById('examDiagnosis').value       = ex.diagnosis || '';
+  document.getElementById('examPrescriptions').value   = ex.prescriptions || '';
+  document.getElementById('examRecommendations').value = ex.recommendations || '';
+
+  const noteBox = document.getElementById('examStatusNote');
+  if(isCompleted){
+    noteBox.innerHTML = '<div class="modal-note ok">✓ Приём завершён ' +
+      esc(fmtDateTime(ex.completedAt)) + '. Можно исправить записи и сохранить.</div>';
+  } else if(ex.updatedAt){
+    noteBox.innerHTML = '<div class="modal-note">Последнее сохранение: ' +
+      esc(fmtDateTime(ex.updatedAt)) + '</div>';
+  } else {
+    noteBox.innerHTML = '<div class="modal-note">Заполните нужные поля и нажмите «Завершить приём».</div>';
+  }
+
+  const actions = document.getElementById('examActions');
+  if(isCompleted){
+    actions.innerHTML =
+      '<button class="btn btn-ghost" onclick="closeExamModal()">Закрыть</button>' +
+      '<button class="btn btn-primary" onclick="saveExam(false)">💾 Сохранить изменения</button>';
+  } else {
+    actions.innerHTML =
+      '<button class="btn btn-ghost" onclick="closeExamModal()">Отмена</button>' +
+      '<button class="btn btn-primary" onclick="saveExam(false)">💾 Сохранить</button>' +
+      '<button class="btn btn-complete" onclick="saveExam(true)">✓ Завершить приём</button>';
+  }
+
+  if(status === 'active' || status === 'accepted'){
+    db.ref('appointments/' + id).update({
+      status: 'in_progress',
+      examStartedAt: a.exam?.startedAt || Date.now()
+    });
+  }
+
+  document.getElementById('examModal').classList.add('open');
+}
+function closeExamModal(){
+  document.getElementById('examModal').classList.remove('open');
+  examContext = null;
+}
+function saveExam(complete){
+  if(!examContext) return;
+  const complaints      = document.getElementById('examComplaints').value.trim();
+  const diagnosis       = document.getElementById('examDiagnosis').value.trim();
+  const prescriptions   = document.getElementById('examPrescriptions').value.trim();
+  const recommendations = document.getElementById('examRecommendations').value.trim();
+
+  if(complete && !complaints && !diagnosis && !prescriptions && !recommendations){
+    if(!confirm('Все поля пустые. Завершить приём без записей?')) return;
+  }
+
+  const data = {
+    'exam/complaints':      complaints,
+    'exam/diagnosis':       diagnosis,
+    'exam/prescriptions':   prescriptions,
+    'exam/recommendations': recommendations,
+    'exam/updatedAt':       Date.now(),
+    'exam/doctorId':        currentDoctor
+  };
+
+  if(complete){
+    data['status'] = 'completed';
+    data['exam/completedAt'] = Date.now();
+    data['completedBy'] = currentDoctor;
+    const doc = DOCTORS.find(d=>d.id === currentDoctor);
+    data['completedByName'] = doc ? (doc.spec + ' ' + doc.name) : '';
+  } else {
+    const cur = appointments[examContext];
+    if(cur && String(cur.status || 'active') === 'active'){
+      data['status'] = 'in_progress';
+    }
+  }
+
+  db.ref('appointments/' + examContext).update(data)
+    .then(()=>{
+      closeExamModal();
+      toast(complete ? '✓ Приём завершён' : '💾 Изменения сохранены');
+    })
+    .catch(err => toast('Ошибка: ' + err.message));
+}
+
+/* ============================================================
+   НАПРАВЛЕНИЕ: модалка
 ============================================================ */
 function openRefModal(apptId){
   const a = appointments[apptId];
@@ -517,27 +780,128 @@ function openRefModal(apptId){
   document.getElementById('refModalSub').textContent =
     'Пациент: ' + a.fio + ' (карта №' + (a.card || '—') + ')';
 
+  // Сбрасываем состояние
+  multiRows = [];
+  document.getElementById('refReason').value = '';
+  document.getElementById('refReason').classList.remove('err');
+  document.getElementById('refSingleSection').style.display = 'block';
+  document.getElementById('refMultiSection').style.display = 'none';
+  document.getElementById('refMultiList').innerHTML = '';
+  document.getElementById('refForwardNote').style.display = 'block';
+
+  // Наполняем одиночный селект
   const sel = document.getElementById('refDoctor');
   sel.innerHTML = '<option value="">— выберите врача —</option>' +
     DOCTORS.filter(d=>d.id !== currentDoctor)
       .map(d=>'<option value="' + d.id + '">' + d.spec + ' ' + d.name + ' — каб. ' + d.room + '</option>')
       .join('');
-
   sel.classList.remove('err');
   document.getElementById('refDate').value = document.getElementById('apptDate').value || todayStr();
   document.getElementById('refDate').classList.remove('err');
   document.getElementById('refTime').innerHTML = '<option value="">— выберите дату и врача —</option>';
   document.getElementById('refTime').classList.remove('err');
-  document.getElementById('refReason').value = '';
-  document.getElementById('refReason').classList.remove('err');
 
   document.getElementById('refModal').classList.add('open');
 }
 function closeRefModal(){
   document.getElementById('refModal').classList.remove('open');
   refContext = null;
+  multiRows = [];
 }
 
+/* ============================================================
+   ПЕРЕКЛЮЧАТЕЛЬ ПРИЧИНЫ
+============================================================ */
+function onRefReasonChange(){
+  const reason = document.getElementById('refReason').value;
+  const single = document.getElementById('refSingleSection');
+  const multi  = document.getElementById('refMultiSection');
+  document.getElementById('refReason').classList.remove('err');
+
+  if(reason === 'Профосмотр'){
+    single.style.display = 'none';
+    multi.style.display = 'block';
+    document.getElementById('refForwardNote').style.display = 'none';
+    if(!multiRows.length) addMultiDoctorRow();
+    renderMultiList();
+  } else {
+    single.style.display = 'block';
+    multi.style.display = 'none';
+    document.getElementById('refForwardNote').style.display = 'block';
+  }
+}
+
+/* ============================================================
+   МУЛЬТИ-РЕЖИМ: строки для профосмотра
+============================================================ */
+function addMultiDoctorRow(){
+  multiRows.push({ doctorId: '', date: document.getElementById('apptDate').value || todayStr(), time: '' });
+  renderMultiList();
+}
+function removeMultiRow(index){
+  multiRows.splice(index, 1);
+  renderMultiList();
+}
+function onMultiFieldChange(index, field, value){
+  if(!multiRows[index]) return;
+  multiRows[index][field] = value;
+  if(field === 'doctorId' || field === 'date') multiRows[index].time = '';
+  renderMultiList();
+}
+function onMultiTimeChange(index, value){
+  if(!multiRows[index]) return;
+  multiRows[index].time = value;
+}
+
+function renderMultiList(){
+  const box = document.getElementById('refMultiList');
+  if(!multiRows.length){
+    box.innerHTML = '<div class="multi-empty">Пока никого не добавили. Нажмите «+ Добавить врача».</div>';
+    return;
+  }
+
+  // Уже выбранные врачи (для скрытия дублей)
+  const chosen = new Set(multiRows.map(r=>r.doctorId).filter(Boolean));
+
+  box.innerHTML = multiRows.map((row, i)=>{
+    const docOptions = DOCTORS
+      .filter(d=>d.id !== currentDoctor)
+      .map(d=>{
+        const isSel = d.id === row.doctorId;
+        const isDup = chosen.has(d.id) && !isSel;
+        return '<option value="' + d.id + '"' + (isSel?' selected':'') + '>' +
+          d.spec + ' ' + d.name.split(' ')[0] + ' — каб. ' + d.room +
+          (isDup ? ' (выбран)' : '') + '</option>';
+      }).join('');
+
+    let timeOptions = '<option value="">— время —</option>';
+    if(row.doctorId && row.date){
+      const slots = computeSlots(row.doctorId, row.date).filter(s=>!s.busy);
+      if(slots.length){
+        timeOptions = '<option value="">— время —</option>' +
+          slots.map(s=>'<option value="' + s.time + '"' + (s.time === row.time ? ' selected' : '') + '>' + s.time + '</option>').join('');
+      } else {
+        timeOptions = '<option value="">нет слотов</option>';
+      }
+    }
+
+    return '<div class="multi-row">' +
+      '<select class="m-doctor" onchange="onMultiFieldChange(' + i + ',\'doctorId\',this.value)">' +
+        '<option value="">— врач —</option>' + docOptions +
+      '</select>' +
+      '<input class="m-date" type="date" value="' + row.date + '" min="' + todayStr() + '" ' +
+        'onchange="onMultiFieldChange(' + i + ',\'date\',this.value)">' +
+      '<select class="m-time" onchange="onMultiTimeChange(' + i + ',this.value)">' +
+        timeOptions +
+      '</select>' +
+      '<button class="m-remove" onclick="removeMultiRow(' + i + ')" title="Удалить">×</button>' +
+    '</div>';
+  }).join('');
+}
+
+/* ============================================================
+   ОДИНОЧНОЕ НАПРАВЛЕНИЕ
+============================================================ */
 function onRefFieldsChange(){
   const docId = document.getElementById('refDoctor').value;
   const dateStr = document.getElementById('refDate').value;
@@ -553,19 +917,16 @@ function onRefFieldsChange(){
   }
 }
 
-function submitReferral(){
-  if(!refContext) return;
+function submitSingleReferral(reason){
   const docId   = document.getElementById('refDoctor').value;
   const dateStr = document.getElementById('refDate').value;
   const time    = document.getElementById('refTime').value;
-  const reason  = document.getElementById('refReason').value;
 
   let ok = true;
-  [['refDoctor',docId], ['refDate',dateStr], ['refTime',time], ['refReason',reason]]
-    .forEach(([id,v])=>{
-      document.getElementById(id).classList.toggle('err', !v);
-      if(!v) ok = false;
-    });
+  [['refDoctor',docId], ['refDate',dateStr], ['refTime',time]].forEach(([id,v])=>{
+    document.getElementById(id).classList.toggle('err', !v);
+    if(!v) ok = false;
+  });
   if(!ok) return;
 
   if(computeSlots(docId, dateStr).some(s=>s.time === time && s.busy)){
@@ -575,46 +936,146 @@ function submitReferral(){
   const src = appointments[refContext];
   const srcDoc = DOCTORS.find(d=>d.id === currentDoctor);
   const target = DOCTORS.find(d=>d.id === docId);
-  const targetName = target ? (target.spec + ' ' + target.name) : '';
 
-  // 1) Создаём новую запись у целевого врача
   const newAppt = {
     doctorId: docId,
     patientId: src.patientId || '',
-    fio: src.fio,
-    card: src.card || '',
-    polis: src.polis || '',
-    phone: src.phone || '',
-    date: dateStr,
-    time: time,
-    reason: reason,
+    fio: src.fio, card: src.card || '',
+    polis: src.polis || '', phone: src.phone || '',
+    date: dateStr, time: time, reason: reason,
     referralFrom: currentDoctor,
     referralFromName: srcDoc ? (srcDoc.spec + ' ' + srcDoc.name) : '',
     status: 'active',
     createdAt: Date.now()
   };
 
-  // 2) Исходную запись помечаем принятой + отмечаем, куда направили
   const updates = {};
-  updates['appointments/' + refContext + '/status']      = 'accepted';
-  updates['appointments/' + refContext + '/acceptedAt']  = Date.now();
-  updates['appointments/' + refContext + '/acceptedBy']  = currentDoctor;
-  updates['appointments/' + refContext + '/forwardedTo'] = docId;
-  updates['appointments/' + refContext + '/forwardedToName'] = targetName;
-  updates['appointments/' + refContext + '/referralDate'] = dateStr;
-  updates['appointments/' + refContext + '/referralTime'] = time;
-  updates['appointments/' + refContext + '/forwardedAt']  = Date.now();
+  const curStatus = String(src.status || 'active');
+  if(curStatus !== 'completed'){
+    updates['appointments/' + refContext + '/status']     = 'accepted';
+    updates['appointments/' + refContext + '/acceptedAt'] = Date.now();
+    updates['appointments/' + refContext + '/acceptedBy'] = currentDoctor;
+  }
+  updates['appointments/' + refContext + '/forwardedTo']     = docId;
+  updates['appointments/' + refContext + '/forwardedToName'] = target ? (target.spec + ' ' + target.name) : '';
+  updates['appointments/' + refContext + '/referralDate']    = dateStr;
+  updates['appointments/' + refContext + '/referralTime']    = time;
+  updates['appointments/' + refContext + '/forwardedCount']  = 1;
+  updates['appointments/' + refContext + '/forwardedAt']     = Date.now();
 
-  // Атомарно: push + update через транзакцию необязательно, делаем последовательно
-  db.ref('appointments').push(newAppt).then(()=>{
-    return db.ref().update(updates);
-  }).then(()=>{
+  const key = db.ref('appointments').push().key;
+  updates['appointments/' + key] = newAppt;
+
+  db.ref().update(updates).then(()=>{
     closeRefModal();
-    toast('Пациент принят и направлен к ' + (target ? target.spec : 'врачу') +
+    toast('Пациент направлен к ' + (target ? target.spec : 'врачу') +
       ' на ' + fmtDate(dateStr) + ' в ' + time);
   }).catch(err => toast('Ошибка: ' + err.message));
 }
 
+/* ============================================================
+   МУЛЬТИ-НАПРАВЛЕНИЕ (профосмотр)
+============================================================ */
+function submitMultiReferral(reason){
+  if(!multiRows.length){
+    toast('Добавьте хотя бы одного врача'); return;
+  }
+
+  const validRows = [];
+  const seenDocs = new Set();
+  const seenSlots = new Set();
+
+  for(let i = 0; i < multiRows.length; i++){
+    const row = multiRows[i];
+    if(!row.doctorId || !row.date || !row.time){
+      toast('Заполните врача, дату и время в строке ' + (i+1)); return;
+    }
+    if(seenDocs.has(row.doctorId)){
+      const d = DOCTORS.find(x=>x.id === row.doctorId);
+      toast('Врач «' + (d ? d.spec : '') + '» выбран дважды'); return;
+    }
+    seenDocs.add(row.doctorId);
+
+    const slotKey = row.doctorId + '|' + row.date + '|' + row.time;
+    if(seenSlots.has(slotKey)){
+      toast('Дублирующий слот ' + row.time); return;
+    }
+    seenSlots.add(slotKey);
+
+    if(computeSlots(row.doctorId, row.date).some(s=>s.time === row.time && s.busy)){
+      const d = DOCTORS.find(x=>x.id === row.doctorId);
+      toast('Слот ' + row.time + ' у врача ' + (d ? d.spec : '') + ' уже занят'); return;
+    }
+    validRows.push(row);
+  }
+
+  const src = appointments[refContext];
+  const srcDoc = DOCTORS.find(d=>d.id === currentDoctor);
+  const updates = {};
+
+  // Создаём все новые записи одним update
+  validRows.forEach(row => {
+    const key = db.ref('appointments').push().key;
+    updates['appointments/' + key] = {
+      doctorId: row.doctorId,
+      patientId: src.patientId || '',
+      fio: src.fio, card: src.card || '',
+      polis: src.polis || '', phone: src.phone || '',
+      date: row.date, time: row.time, reason: reason,
+      referralFrom: currentDoctor,
+      referralFromName: srcDoc ? (srcDoc.spec + ' ' + srcDoc.name) : '',
+      status: 'active',
+      createdAt: Date.now()
+    };
+  });
+
+  // Обновляем исходную запись
+  const curStatus = String(src.status || 'active');
+  if(curStatus !== 'completed'){
+    updates['appointments/' + refContext + '/status']     = 'accepted';
+    updates['appointments/' + refContext + '/acceptedAt'] = Date.now();
+    updates['appointments/' + refContext + '/acceptedBy'] = currentDoctor;
+  }
+  updates['appointments/' + refContext + '/forwardedTo']      = validRows[0].doctorId;
+  updates['appointments/' + refContext + '/forwardedToName']  = validRows.map(r=>{
+    const t = DOCTORS.find(d=>d.id === r.doctorId);
+    return t ? t.spec : '';
+  }).filter(Boolean).join(', ');
+  updates['appointments/' + refContext + '/forwardedToMany']  = validRows.map(r=>r.doctorId);
+  updates['appointments/' + refContext + '/forwardedCount']   = validRows.length;
+  updates['appointments/' + refContext + '/forwardedList']    = validRows.map(r=>({
+    doctorId: r.doctorId, date: r.date, time: r.time
+  }));
+  updates['appointments/' + refContext + '/forwardedAt']      = Date.now();
+
+  db.ref().update(updates).then(()=>{
+    closeRefModal();
+    toast('Пациент направлен на профосмотр к ' +
+      validRows.length + ' ' +
+      plural(validRows.length, 'врачу', 'врачам', 'врачам'));
+  }).catch(err => toast('Ошибка: ' + err.message));
+}
+
+/* ============================================================
+   ДИСПЕТЧЕР ОТПРАВКИ
+============================================================ */
+function submitReferral(){
+  if(!refContext) return;
+  const reason = document.getElementById('refReason').value;
+  if(!reason){
+    document.getElementById('refReason').classList.add('err');
+    return;
+  }
+  if(reason === 'Профосмотр'){
+    submitMultiReferral(reason);
+  } else {
+    submitSingleReferral(reason);
+  }
+}
+
+/* ============================================================
+   TOAST
+============================================================ */
 function toast(msg){
   const t = document.getElementById('toast');
   t.textContent = msg;
@@ -635,6 +1096,7 @@ db.ref('appointments').on('value', snap=>{
     if(a && typeof a === 'object') appointments[id] = { ...a, __id: id };
   });
   if(refContext && !appointments[refContext]) refContext = null;
+  if(examContext && !appointments[examContext]) examContext = null;
   renderAll();
 });
 
